@@ -1,0 +1,13 @@
+﻿@if (Notification.has_flash())
+{
+    //notifi 1.5s
+    var Notifi = Notification.get_flash();
+    <input type="hidden" value="@Notifi.msgType1_5s" name="msgType1_5s" />
+    <input type="hidden" value="@Notifi.msg1_5s" name="msg1_5s" />
+    //notifi 3s
+    <input type="hidden" value="@Notifi.msgType3s" name="msgType3s" />
+    <input type="hidden" value=" @Notifi.msg3s" name="msg3s" />
+    //notifi 5s
+    <input type="hidden" value="@Notifi.msgType5s" name="msgType5s" />
+    <input type="hidden" value=" @Notifi.msg5s" name="msg5s" />
+}

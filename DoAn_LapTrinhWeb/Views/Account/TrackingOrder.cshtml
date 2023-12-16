@@ -1,0 +1,89 @@
+﻿@using DoAn_LapTrinhWeb.Common.Helpers
+@using DoAn_LapTrinhWeb.Model
+
+@using PagedList
+@model IPagedList<DoAn_LapTrinhWeb.Model.Order>
+@{
+    ViewBag.Title = "Lịch sử mua hàng";
+    Layout = "~/Views/Shared/Main_Layout.cshtml";
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+}
+<!--start tracking order-->
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- ...:::: Start Breadcrumb Section:::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--black">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
+                                    <li>
+                                        <a href="#">Tài khoản</a>
+                                    </li>
+                                    <li class="active" aria-current="page">
+                                        Lịch sử mua hàng
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Breadcrumb Section:::... -->
+    <!-- ...:::: Start Account Dashboard Section:::... -->
+    <div class="account-dashboard">
+        <div class="container">
+            <div class="row">
+                @Html.Partial("Dashboard")
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <!-- Tab panes -->
+                    <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="0">
+                        <div id="orders">
+                            <h4>Lịch sử mua hàng</h4>
+                            <div class="table_page table-responsive" style="overflow-x: hidden; border-left: 0.5px solid #0000001c; border-right: 0.5px solid #0000001c; border-top: 0.5px solid #0000001c;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Đơn Hàng</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Trạng thái</th>
+                                            <th>Số lượng đặt</th>
+                                            <th>Tổng Tiền</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>#@item.order_id</td>
+                                                <td>@item.oder_date.ToString("HH:mm dd-MM-yyyy")</td>
+                                                <td>@(item.status == "1" ? "Chờ xử lý": item.status == "2"? "Đang xử lý" : item.status == "3" ? "Hoàn thành": "Bị hủy")</td>
+                                                <td>@item.Oder_Detail.Sum(m => m.quantity)</td>
+                                                <td>@item.total.ToString("#,0₫", culture.NumberFormat)</td>
+                                                <td><a href="@Url.Action("TrackingOrderDetail","Account",new {id=item.order_id})" class="view">Xem</a></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Start Pagination -->
+                        <div class="page-pagination text-center d-flex justify-content-center" data-aos="fade-up" data-aos-delay="0">
+                            @Html.Partial("Pager", Model)
+                        </div>
+                        <!-- End Pagination -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Account Dashboard Section:::... -->
+
+}

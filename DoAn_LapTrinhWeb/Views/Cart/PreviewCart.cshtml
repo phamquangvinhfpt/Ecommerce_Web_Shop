@@ -1,0 +1,73 @@
+﻿@using DoAn_LapTrinhWeb.Models
+@using DoAn_LapTrinhWeb.Common
+@model IEnumerable<Product>
+@{
+    ViewBag.Title = "Giỏ hàng";
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+    List<int> quans = ViewBag.Quans as List<int>;
+    double totalPrice = 0d;
+    double shippingFee = 30000d;    // Phí vận chuyển 30k
+}
+<!-- Start Offcanvas Addcart Section -->
+<div id="offcanvas-add-cart"
+     class="offcanvas offcanvas-rightside offcanvas-add-cart-section">
+    <!-- Start Offcanvas Header -->
+    <div class="offcanvas-header text-right">
+        <button class="offcanvas-close">
+            <i class="ion-android-close"></i>
+        </button>
+    </div>
+    <!-- End Offcanvas Header -->
+    <!-- Start  Offcanvas Addcart Wrapper -->
+    <div class="offcanvas-add-cart-wrapper">
+        <h4 class="offcanvas-title">Giỏ hàng</h4>
+        <ul class="offcanvas-cart">
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                var item = Model.ElementAt(i);
+                var quan = quans[i];
+                var price = item.price;
+                if (item.Discount.discount_star < DateTime.Now && item.Discount.discount_end > DateTime.Now)
+                {
+                    price = item.price - item.Discount.discount_price;
+                }
+                <li class="offcanvas-cart-item-single">
+                    <div class="offcanvas-cart-item-block">
+                        <a href="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.product_name)-@item.product_id" class="mr-3">
+                            <img src="@item.image" alt="@item.product_name" class="offcanvas-cart-image" style=" width: 41px !important;" />
+                        </a>
+                        <div class="offcanvas-cart-item-content">
+                            <a href="#" class="offcanvas-cart-item-link" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@item.product_name</a>
+                            <div class="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.product_name)-@item.product_id">
+                                <span class="offcanvas-cart-item-details-quantity update-quan">@quan x </span>
+                                <span class="offcanvas-cart-item-details-price">@item.price.ToString("#,0₫", culture.NumberFormat)</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                totalPrice += quan * price;
+            }
+        </ul>
+        <div class="offcanvas-cart-total-price">
+            <div class="cart_subtotal" hidden>
+                <p>Tạm tính</p>
+                <p style="font-size:16px;" class="cart_amount totalPrice">@totalPrice.ToString("#,0₫", culture.NumberFormat)</p>
+            </div>
+            <span class="offcanvas-cart-total-price-text">Tổng Tiền :</span>
+            <span class="offcanvas-cart-total-price-value totalPriceWithFee">@((totalPrice + shippingFee).ToString("#,0₫", culture.NumberFormat))</span>
+        </div>
+        <ul class="offcanvas-cart-action-button">
+            <li>
+                <a href="@Url.Action("ViewCart","Cart")" class="btn btn-block btn-golden">Xem giỏ hàng</a>
+            </li>
+            <li>
+                <a href="@Url.Action("Checkout","Cart")" class="js-checkout btn btn-block btn-golden mt-5">Thanh toán</a>
+            </li>
+        </ul>
+    </div>
+    <!-- End  Offcanvas Addcart Wrapper -->
+</div>
+<!-- End  Offcanvas Addcart Section -->
+@section scripts{
+    <script src="~/Scripts/UserJS/cart.js"></script>
+}

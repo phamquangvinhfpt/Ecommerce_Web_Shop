@@ -1,0 +1,266 @@
+﻿@using PagedList.Mvc
+@model PagedList.PagedList<DoAn_LapTrinhWeb.Model.Feedback>
+@{
+    ViewBag.Title = "Danh sách đánh giá";
+    Layout = "~/Areas/Admin/Views/Shared/_MainLayout.cshtml";
+    string requestUrl = Request.Url.Scheme + "://" + Request.Url.Authority;
+    string prePageIcon = "<i class='previous'></i>";
+    string nextPageIcon = "<i class='next'></i>";
+}
+<style>
+    .feedback-content img {
+        display: none !important;
+    }
+    .feedback-content p, .feedback-content span{
+        color:unset!important;
+    }
+</style>
+<link rel="stylesheet" href="~/Content/UserCSS/simditor.css" />
+<!--begin::toolbar-->
+<div class="toolbar" id="kt_toolbar">
+    <!--begin::Container-->
+    <div id="kt_toolbar_container" class="container-fluid d-flex flex-stack">
+        <!--begin::Page title-->
+        <div data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
+            <!--begin::Title-->
+            <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">Danh sách đánh giá</h1>
+            <!--end::Title-->
+            <!--begin::Separator-->
+            <span class="h-20px border-gray-300 border-start mx-4"></span>
+            <!--end::Separator-->
+            <!--begin::Breadcrumb-->
+            <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
+                <!--begin::Item-->
+                <li class="breadcrumb-item text-muted">
+                    <a class="text-muted text-hover-primary">Quản lý sản phẩm</a>
+                </li>
+                <!--end::Item-->
+                <!--begin::Item-->
+                <li class="breadcrumb-item">
+                    <span class="bullet bg-gray-300 w-5px h-2px"></span>
+                </li>
+                <!--end::Item-->
+                <!--begin::Item-->
+                <li class="breadcrumb-item text-dark">Danh sách đánh giá</li>
+                <!--end::Item-->
+            </ul>
+            <!--end::Breadcrumb-->
+        </div>
+        <!--end::Page title-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::toolbar-->
+<!--begin::container-fluid-->
+<div class="d-flex flex-column-fluid">
+    <div class="container  ">
+        <div class="card">
+            <!--begin::Card header-->
+            <div class="card-header border-0 pt-6">
+                <!--begin::Card title-->
+                <div class="card-title">
+                    <!--begin::Search-->
+                    <div class="d-flex align-items-center position-relative my-1">
+                        <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                        <span class="svg-icon svg-icon-1 position-absolute ms-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="black"></rect>
+                                <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="black"></path>
+                            </svg>
+                        </span>
+                        <!--end::Svg Icon-->
+                        <form>
+                            <input type="search" name="search" class="form-control form-control-solid w-250px ps-14" placeholder="Tìm kiếm đánh giá...">
+                        </form>
+                    </div>
+                    <!--end::Search-->
+                </div>
+                <!--begin::Card title-->
+            </div>
+            <!--end::Card header-->
+            <!--begin::Card body-->
+            <div class="card-body py-4">
+                <!--begin::Table-->
+                <div id="kt_table_users_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="list-product">
+                            <!--begin::Table head-->
+                            <thead>
+                                <!--begin::Table row-->
+                                <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                                    <th class="min-w-50px" tabindex="1" arowspan="1" colspan="1" style="width:50px;">ID</th>
+                                    <th class="min-w-150px" tabindex="2" rowspan="1" colspan="1" style="width:50px;">Họ tên</th>
+                                    <th class="min-w-150px" tabindex="2" rowspan="1" colspan="1" style="width:250px;">Sản phẩm</th>
+                                    <th class="min-w-125px" tabindex="5" rowspan="1" colspan="1" style="width:30px;">Số sao</th>
+                                    <th class="min-w-125px" tabindex="5" rowspan="1" colspan="1" style="width:200px;">Nội dung</th>
+                                    <th class="min-w-125px" tabindex="5" rowspan="1" colspan="1" style="width:120px;">Ngày tạo</th>
+                                    <th class="text-end min-w-100px sorting_disabled" rowspan="1" colspan="1" style="width: 130.25px;">Hành động</th>
+                                </tr>
+                                <!--end::Table row-->
+                            </thead>
+                            <!--end::Table head-->
+                            <!--begin::Table body-->
+                            <tbody class="text-gray-600 fw-bold">
+                                @foreach (var item in Model)
+                                {
+                                <tr class="odd" id="item_@item.genre_id">
+                                    <td>@item.feedback_id </td>
+                                    <td>@item.Account.Name</td>
+                                    <td><a target="_blank" class="text-gray-600 fw-bold" href="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.Product.product_name)-@item.product_id">@item.Product.product_name</a></td>
+                                    <td>@item.rate_star</td>
+                                    <td class="feedback-content">@Html.Raw(item.content)</td>
+                                    <td>@item.create_at.ToString("HH:mm dd-MM-yyyy")</td>
+                                    <!--begin::Action=-->
+                                    <td class="text-end">
+                                        <a href="#" class="btn btn-light btn-active-light-primary btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                            Hành động
+                                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
+                                            <span class="svg-icon svg-icon-5 m-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z" fill="black"></path>
+                                                </svg>
+                                            </span>
+                                            <!--end::Svg Icon-->
+                                        </a>
+                                        <!--begin::Menu-->
+                                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                                            <!--begin::Menu item-->
+                                            <div class="menu-item px-3">
+                                                <a onclick="CreateReplyFeedback(@item.feedback_id, '@item.Product.product_name', '@item.content', '@item.Account.Name')" class="menu-link px-3">Trả lời</a>
+                                            </div>
+                                            <!--end::Menu item-->
+                                        </div>
+                                        <!--end::Menu-->
+                                    </td>
+                                    <!--end::Action=-->
+                                </tr>
+                                }
+                            </tbody>
+                            <!--end::Table body-->
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start">
+                        </div>
+                        <div class="col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end">
+                            <div>
+                                @Html.PagedListPager(Model, page => Url.Action("Index", new { search = @ViewBag.search, page }), new PagedListRenderOptions
+                           {
+                               LinkToPreviousPageFormat = prePageIcon,
+                               LinkToNextPageFormat = nextPageIcon,
+                               DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+                               DisplayLinkToLastPage = PagedListDisplayMode.Never,
+                               DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                               DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                               MaximumPageNumbersToDisplay = 10
+                           })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Table-->
+            </div>
+            <!--end::Card body-->
+        </div>
+    </div>
+</div>
+<!--end::container-fluid-->
+<!--begin::Modal - Edit-->
+<div class="modal fade" id="reply-modal" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <!--begin::Modal content-->
+        <div class="modal-content rounded">
+            <!--begin::Modal header-->
+            <div class="modal-header pb-0 border-0 justify-content-end">
+                <!--begin::Close-->
+                <div class="btn btn-sm btn-icon btn-active-color-primary dimis-modal">
+                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="black" />
+                            <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="black" />
+                        </svg>
+                    </span>
+                    <!--end::Svg Icon-->
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--begin::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                <!--begin:Form-->
+                <form id="kt_modal_new_target_form" class="form" action="#">
+                    <!--begin::Heading-->
+                    <div class="mb-13 text-center">
+                        <!--begin::Title-->
+                        <h1>Phản hồi Đánh giá/Bình luận</h1>
+                        <!--end::Title-->
+                    </div>
+                    <!--end::Heading-->
+                    <!--begin::Input group-->
+                    <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 fw-bold mb-2">
+                            <span>Sản phẩm</span>
+                        </label>
+                        <!--end::Label-->
+                        <div id="feedback-product" class="form-control form-control-solid" disabled></div>
+                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Input group-->
+                    <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 fw-bold mb-2">
+                            <span>Nội dung đánh giá</span>
+                        </label>
+                        <!--end::Label-->
+                        <div id="feedback-content" class="form-control form-control-solid" disabled></div>
+                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Input group-->
+                    <div class="d-flex flex-column mb-8 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 fw-bold mb-2">
+                            <span class="required">Nội dung trả lời</span>
+                        </label>
+                        <!--end::Label-->
+                        <textarea type="text" id="reply_comment_con" class="form-control form-control-solid"></textarea>
+                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Actions-->
+                    <div class="text-center">
+                        <button type="button" class="btn btn-light me-3 dimis-modal">Hủy bỏ</button>
+                        <button type="button" id="submit_reply_comm" class="btn btn-primary">Lưu</button>
+                    </div>
+                    <!--end::Actions-->
+                </form>
+                <!--end:Form-->
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Edit-->
+<link href="~/Content/AdminCSS/PagedList.css" rel="stylesheet" />
+@section scripts
+{
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/module.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/uploader.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/hotkeys.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/dompurify.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/simditor.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/mobilecheck.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/page-demo.js"></script>
+    <script src="~/Scripts/AdminJS/repry-feedback.js"></script>
+}
+
+
+
+
+

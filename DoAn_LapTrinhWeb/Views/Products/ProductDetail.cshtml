@@ -1,0 +1,831 @@
+﻿@using DoAn_LapTrinhWeb.Models
+@using DoAn_LapTrinhWeb.Common
+@using PagedList.Mvc
+@using DoAn_LapTrinhWeb.Common.Helpers
+@model Product
+@{
+    ViewBag.Title = Model.product_name;
+    ViewBag.Image = Model.image;
+    Layout = "~/Views/Shared/Main_Layout.cshtml";
+    var relatedproduct = (List<DoAn_LapTrinhWeb.Models.Product>)ViewBag.relatedproduct;
+    var listImage = (List<DoAn_LapTrinhWeb.Model.ProductImages>)ViewBag.ProductImage;
+    var listFeedback = (List<DoAn_LapTrinhWeb.Model.Feedback>)ViewBag.ListFeedback;
+    var listReplyFeedback = (List<DoAn_LapTrinhWeb.Model.ReplyFeedback>)ViewBag.ListReplyFeedback;
+    var OrderFeedback = (List<DoAn_LapTrinhWeb.Model.Oder_Detail>)ViewBag.OrderFeedback;
+    var pagerFeekback = (PagedList.PagedList<DoAn_LapTrinhWeb.Model.Feedback>)ViewBag.PagerFeedback;
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+    double onestar = 1; int c_onestar = 0; double truestar = 2; int c_truestar = 0;
+    double threestar = 3; int c_threestar = 0; ; double fourstar = 4; int c_fourstar = 0;
+    double fivestar = 5; int c_fivestar = 0; int totalrating = 0; double avg = 0;
+    string avgStar = "";
+    if (User.Identity.IsAuthenticated)
+    {
+        //role admin redirect to admin page
+        if (User.Identity.GetRole() != 1)
+        {
+            Response.Redirect("~/Admin/DashBoards");
+        }
+    }
+    foreach (var item in listFeedback)
+    {
+        if (item.product_id == Model.product_id)
+        {
+            foreach (var orderitem in OrderFeedback)
+            {
+                if (orderitem.product_id == item.product_id && item.product_id == Model.product_id && orderitem.Order.status == "3")
+                {
+                    totalrating++;
+                    if (item.rate_star == 1)
+                    {
+                        c_onestar++;
+                    }
+                    if (item.rate_star == 2)
+                    {
+                        c_truestar++;
+                    }
+                    if (item.rate_star == 3)
+                    {
+                        c_threestar++;
+                    }
+                    if (item.rate_star == 4)
+                    {
+                        c_fourstar++;
+                    }
+                    if (item.rate_star == 5)
+                    {
+                        c_fivestar++;
+                    }
+                }
+            }
+        }
+    }
+    avg = (onestar * c_onestar / totalrating) + (truestar * c_truestar / totalrating) + (threestar * c_threestar / totalrating) +
+    (fourstar * c_fourstar / totalrating) + (fivestar * c_fivestar / totalrating);
+    if (avg >= 1 && avg < 2)
+    {
+        avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>";
+    }
+    else if ((avg >= 2) && (avg < 3))
+    {
+        avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>";
+    }
+    else if ((avg >= 3) && (avg < 4))
+    {
+        avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>";
+    }
+    else if ((avg >= 4) && (avg < 5))
+    {
+        avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>";
+    }
+    else if (avg == 5)
+    {
+        avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>" +
+               "<li class='fill'><i class='ion-android-star'></i></li>";
+    }
+    else
+    {
+        avgStar = "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>" +
+               "<li class='empty'><i class='ion-android-star'></i></li>";
+    }
+}
+<link rel="stylesheet" href="~/Content/UserCSS/simditor.css" />
+<!-- ...:::: Start Breadcrumb Section:::... -->
+<div class="breadcrumb-section breadcrumb-bg-color--black">
+    <div class="breadcrumb-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                        <nav aria-label="breadcrumb">
+                            <ul>
+                                <li><a href="index.html">Trang Chủ</a></li>
+                                <li>
+                                    <a href="shop-grid-sidebar-left.html">Sản phẩm</a>
+                                </li>
+                                <li class="active" aria-current="page">
+                                    Chi tiết sản phẩm
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ...:::: End Breadcrumb Section:::... -->
+<!-- Start Product Details Section -->
+<div class="product-details-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-5 col-lg-6">
+                <div class="product-details-gallery-area"
+                     data-aos="fade-up"
+                     data-aos-delay="0">
+                    <!-- Start Large Image -->
+                    <div class="product-large-image product-large-image-horaizontal swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
+                                <img src="@Model.image" alt="@Model.product_name" />
+                            </div>
+                            @foreach (var item in listImage)
+                            {
+                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
+                                    <img src="@item.image" alt="@Model.product_name" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <!-- End Large Image -->
+                    <!-- Start Thumbnail Image -->
+                    <div class="product-image-thumb product-image-thumb-horizontal swiper-container pos-relative mt-5">
+                        <div class="swiper-wrapper">
+                            <div class="product-image-thumb-single swiper-slide">
+                                <img class="img-fluid" src="@Model.image" alt="@Model.product_name" />
+                            </div>
+                            @foreach (var item in listImage)
+                            {
+                                <div class="product-image-thumb-single swiper-slide">
+                                    <img class="img-fluid" src="@item.image" alt="@Model.product_name" />
+                                </div>
+                            }
+                        </div>
+                        <!-- Add Arrows -->
+                        <div class="gallery-thumb-arrow swiper-button-next"></div>
+                        <div class="gallery-thumb-arrow swiper-button-prev"></div>
+                    </div>
+                    <!-- End Thumbnail Image -->
+                </div>
+            </div>
+            <div class="col-xl-7 col-lg-6">
+                <div class="product-details-content-area product-details--golden"
+                     data-aos="fade-up"
+                     data-aos-delay="200">
+                    <!-- Start  Product Details Text Area-->
+                    <div class="product-details-text">
+                        <h4 class="title">@Model.product_name</h4>
+                        <div class="d-flex align-items-center">
+                            <ul class="review-star">
+                                @Html.Raw(avgStar)
+                            </ul>
+                            <a href="#" class="customer-review ml-2">(@ViewBag.CountFeedback đánh giá)</a>
+                        </div>
+                        @if (Model.Discount.discount_star < DateTime.Now && Model.Discount.discount_end > DateTime.Now && Model.Discount.discount_price != 0)
+                        {
+                            <div class="price">
+                                <del style="font-size:20px; margin-right:7px;">@Model.price.ToString("#,0₫", culture.NumberFormat)</del>
+                                <span style="color: #d0021c; font-weight: 600;">@((Model.price - Model.Discount.discount_price).ToString("#,0₫", culture.NumberFormat))</span>
+                                <span style="font-size:16px;" class="text-success">-@((((Model.price) /(Model.price))-((Model.price - Model.Discount.discount_price)/(Model.price))).ToString("0%"))</span>
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class="price" style="color: #d0021c; font-weight: 600;">@Model.price.ToString("#,0₫", culture.NumberFormat)</div>
+                        }
+                        <div>
+                            <div style="font-weight:600;">
+                                Khuyến mãi liên quan
+                            </div>
+                            <ul style="list-style: inside;">
+                                <li class="ml-sm-3">
+                                    Nhập mã <strong>KIZSPY300</strong>  giảm thêm 3% tối đa 300.000đ khi thanh toán qua VNPAY-QR.<a href="#" style="color: #024dbc; font-weight: 500;"> Xem chi tiết</a>
+                                </li>
+                                <li class="ml-sm-3">
+                                    Nhập mã <strong>KIZSPY3800</strong> giảm thêm 4% tối đa 800.000đ. Áp dụng cho một số sản phẩm Apple trên 20.000.000đ khi thanh toán qua VNPAY-QR.<a href="#" style="color: #024dbc; font-weight:500;"> Xem chi tiết</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- End  Product Details Text Area-->
+                    <!-- Start Product Variable Area -->
+                    <div class="product-details-variable">
+                        <!-- Product Variable Single Item -->
+                        <div class="variable-single-item">
+                            <div class="product-stock">
+                                <span class="product-stock-in">
+                                    <i class="ion-checkmark-circled"></i>
+                                </span>
+                                Còn lại @Model.quantity
+                            </div>
+                        </div>
+                        <!-- Product Variable Single Item -->
+                        <div class="d-flex align-items-center">
+                            @if (Model.quantity != "0")
+                            {
+                                <div class="variable-single-item">
+                                    <span>Số Lượng</span>
+                                    <div class="product-variable-quantity">
+                                        <input step="1" min="1" max="@Model.quantity" id="quantity" autocomplete="off" name="quantity" value="1" type="number" />
+                                    </div>
+                                </div>
+                                <div class="d-flex" style="gap:7px;">
+                                    <div class="product-add-to-cart-btn d-flex">
+                                        <a style="user-select:none!important;" data-id="@Model.product_id" class="buyNow btn btn-block btn-lg btn-black-default-hover">Mua ngay</a>
+                                    </div>
+                                    <div class="product-add-to-cart-btn d-flex">
+                                        <a style="user-select: none !important; border-color: #FE8C23; color: #FE8C23;background:#fff;" data-id="@Model.product_id" class="btnAddToCart btn btn-block btn-lg btn-black-default-hover">Thêm vào giỏ</a>
+                                    </div>
+                                </div>
+
+                            }
+                            else
+                            {
+                                <div class="variable-single-item">
+                                    <span>Số Lượng</span>
+                                    <div class="product-variable-quantity">
+                                        <input step="0" min="0" name="quantity" value="0" readonly />
+                                    </div>
+                                </div>
+                                <div class="product-add-to-cart-btn">
+                                    <a class="btn btn-block btn-lg btn-black-default-hover"> Liên hệ</a>
+                                </div>
+                            }
+                        </div>
+                        <!-- Start  Product Details Meta Area-->
+                        <div class="product-details-meta mb-20">
+                            <a class="icon-space-right"><i class="icon-heart"></i>Thêm vào yêu thích</a>
+                            <a class="icon-space-right"><i class="icon-refresh"></i>So sánh sản phẩm</a>
+                        </div>
+                        <!-- End  Product Details Meta Area-->
+                    </div>
+                    <!-- End Product Variable Area -->
+                    <!-- Start  Product Details Catagories Area-->
+                    <div class="product-details-catagory mb-2">
+                        <span class="title">Thương hiệu:</span>
+                        <ul>
+                            <li><a href="#">@Model.Brand.brand_name</a></li>
+                        </ul>
+                    </div>
+                    <!-- End  Product Details Catagories Area-->
+                    <!-- Start  Product Details Catagories Area-->
+                    <div class="product-details-catagory mb-2">
+                        <span class="title">Danh Mục:</span>
+                        <ul>
+                            <li><a href="#">@Model.Genre.genre_name</a></li>
+                        </ul>
+                    </div>
+                    <!-- End  Product Details Catagories Area-->
+                    <!-- Start  Product Details Social Area-->
+                    <div class="product-details-social">
+                        <span class="title">Chia sẻ:</span>
+                        <ul>
+                            <li>
+                                <a style="cursor:pointer;" id="fb-share-button"><i class="fa fa-facebook"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-pinterest"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- End  Product Details Social Area-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Product Details Section -->
+<!-- Start Product Content Tab Section -->
+<div class="product-details-content-tab-section section-top-gap-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="product-details-content-tab-wrapper"
+                     data-aos="fade-up"
+                     data-aos-delay="0">
+                    <!-- Start Product Details Tab Button -->
+                    <ul class="nav tablist product-details-content-tab-btn d-flex justify-content-center">
+                        <li>
+                            <a class="nav-link active"
+                               data-bs-toggle="tab"
+                               href="#description">
+                                Mô tả sản phẩm
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link"
+                               data-bs-toggle="tab"
+                               href="#specification">
+                                Thông số kỹ thuật
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" data-bs-toggle="tab" href="#review">
+                                Đánh giá
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- End Product Details Tab Button -->
+                    <!-- Start Product Details Tab Content -->
+                    <div class="product-details-content-tab">
+                        <div class="tab-content">
+                            <!-- Start Product Details Tab Content Singel -->
+                            <div class="tab-pane active show" id="description">
+                                <div class="single-tab-content-item">
+                                    <p id="description">
+                                        @Html.Raw(Model.description)
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- End Product Details Tab Content Singel -->
+                            <!-- Start Product Details Tab Content Singel -->
+                            <div class="tab-pane" id="specification">
+                                <div class="single-tab-content-item specs">
+                                    @if (Model.specifications != null)
+                                    {
+                                        @Html.Raw(Model.specifications)
+                                    }
+                                    else
+                                    {
+                                        <span class="d-flex justify-content-center" style="font-size:20px;">Đang cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+                            <!-- End Product Details Tab Content Singel -->
+                            <!-- Start Product Details Tab Content Singel -->
+                            <div class="tab-pane" id="review">
+                                <div class="single-tab-content-item">
+                                    <!-- Start - Review Comment -->
+                                    <div class="review-form" style="margin-bottom:30px;">
+                                        <div class="text-center">
+                                            <h5>THÊM ĐÁNH GIÁ</h5>
+                                            <span class="ms-2 text-secondary">(Đánh giá được tính khi bạn đã mua sản phẩm, chọn sao bên dưới để đánh giá sao)</span>
+                                        </div>
+                                        <form method="post">
+                                            <input id="product_id" hidden value="@Model.product_id" />
+                                            <input id="genre_id" hidden value="@Model.genre_id" />
+                                            <input id="discount_id" hidden value="@Model.disscount_id" />
+                                            <div onmouseout="CRateSelected()" style="font-size: 23px; text-align:center; cursor:pointer;">
+                                                <i id="rate1" onmouseout="CRateOut(1)" onmouseover="CRateOver(1)" onclick="CRateClick(1)" class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i id="rate2" onmouseout="CRateOut(2)" onmouseover="CRateOver(2)" onclick="CRateClick(2)" class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i id="rate3" onmouseout="CRateOut(3)" onmouseover="CRateOver(3)" onclick="CRateClick(3)" class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i id="rate4" onmouseout="CRateOut(4)" onmouseover="CRateOver(4)" onclick="CRateClick(4)" class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i id="rate5" onmouseout="CRateOut(5)" onmouseover="CRateOver(5)" onclick="CRateClick(5)" class="fa fa-star-o" aria-hidden="true"></i>
+                                            </div>
+                                            <input id="lblRating" hidden value="5" />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="default-form-box">
+                                                        <label for="comment-review-text">Nội dung bình luận <span class="text-danger">*</span></label>
+                                                        <textarea id="comment__con" class="rating_login" hidden></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button class="btn btn-md btn-black-default-hover" style="width: 98px;" id="create_submit_comment" type="button"> Gửi đi </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <ul class="comment">
+                                        <!-- Start - Review Comment list-->
+                                        @foreach (var comment in listFeedback)
+                                        {
+                                            if (comment.product_id == Model.product_id)
+                                            {
+                                                <li class="comment-list">
+                                                    <div class="comment-wrapper">
+                                                        <div class="comment-img">
+                                                            <img src="@comment.Account.Avatar" alt="" />
+                                                        </div>
+                                                        <div class="comment-content">
+                                                            <div class="comment-content-top" style="margin-bottom:5px;">
+                                                                <div class="comment-content-left">
+                                                                    <h6 class="comment-name">
+                                                                        @comment.Account.Name
+                                                                        <span>
+                                                                            @{ string fbconfirm = "";
+                                                                                string verify = "";
+                                                                                foreach (var odt in OrderFeedback)
+                                                                                {
+                                                                                    if (odt.Order.account_id == comment.account_id && odt.product_id == comment.product_id && odt.Order.status == "3")
+                                                                                    {
+                                                                                        fbconfirm = "Đã mua tại KAOME";
+                                                                                        verify = "<i class='fa fa-check-circle' aria-hidden='true'></i>";
+                                                                                    }
+                                                                                }
+                                                                                <span class="fs-14px text-success">@Html.Raw(verify)<span style="margin-left:3px;">@fbconfirm</span></span>
+                                                                            }
+                                                                        </span>
+                                                                    </h6>
+                                                                    <ul class="review-star">
+                                                                        @if (comment.rate_star == 1)
+                                                                        {
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                        }
+                                                                        else if (comment.rate_star == 2)
+                                                                        {
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                        }
+                                                                        else if (comment.rate_star == 3)
+                                                                        {
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                        }
+                                                                        else if (comment.rate_star == 4)
+                                                                        {
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                        }
+                                                                        else if (comment.rate_star == 5)
+                                                                        {
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="fill">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                            <li class="empty">
+                                                                                <i class="ion-android-star"></i>
+                                                                            </li>
+                                                                        }
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="comment-content-right">
+                                                                    @if (User.Identity.IsAuthenticated)
+                                                                    {
+                                                                        <a style="cursor:pointer;" onclick="CreateReplyFeedback(@comment.feedback_id,'@comment.Account.Name')"><i class="fa fa-reply"></i>Reply</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <a><i class="fa fa-reply"></i>Reply</a>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div class="para-content">
+                                                                <div>@Html.Raw(comment.content)</div>
+                                                                <p style="font-size: 12px; margin-bottom: 8px; color: #a5a5a5; ">@comment.create_at.ToString("HH:mm dd-MM-yyyy")</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <form action="/" method="post">
+                                                            <textarea id="reply_comment_con_@comment.feedback_id" hidden autofocus></textarea>
+                                                            <button id="submit_reply_comm_@comment.feedback_id" hidden class="btn btn-md btn-black-default-hover" style=" margin-top: 15px; margin-bottom: 12px; width: 98px;" type="button">Gửi đi</button>
+                                                        </form>
+                                                    </div>
+                                                    <!-- Start - Review Comment Reply-->
+                                                    @foreach (var reply in listReplyFeedback)
+                                                    {
+                                                        <ul class="comment-reply">
+                                                            @if (reply.feedback_id == comment.feedback_id)
+                                                            {
+                                                                <li class="comment-reply-list">
+                                                                    <div class="comment-wrapper">
+                                                                        <div class="comment-img">
+                                                                            <img src="@reply.Account.Avatar" alt="avatar" />
+                                                                        </div>
+                                                                        <div class="comment-content">
+                                                                            <div class="comment-content-top" style="margin-bottom:5px;">
+                                                                                <div class="comment-content-left">
+                                                                                    <h6 class="comment-name">@reply.Account.Name <span class="@(reply.Account.Role == 0? "bg-role": reply.Account.Role == 2 ? "bg-role":"")">@(reply.Account.Role == 0? "Quản trị viên": reply.Account.Role == 2 ? "Biên tập viên":"")</span></h6>
+                                                                                </div>
+                                                                                <div class="comment-content-right">
+                                                                                    <a style="cursor:pointer;" onclick="createChildReply(@comment.feedback_id,@reply.rep_feedback_id, '@reply.Account.Name')"><i class="fa fa-reply"></i>Reply</a>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="para-content">
+                                                                                <div> @Html.Raw(reply.content)</div>
+                                                                                <p style="font-size: 12px; margin-bottom: 8px; color: #a5a5a5; ">@reply.create_at.ToString("HH:mm dd-MM-yyyy")</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                        <div>
+                                                            <form action="/" method="post">
+                                                                <textarea id="childRepContent_@reply.rep_feedback_id" hidden autofocus></textarea>
+                                                                <button id="submit_child_reply_comm_@reply.rep_feedback_id" hidden style=" margin-top: 15px; margin-bottom: 12px; width: 98px;" class="btn btn-md btn-black-default-hover" type="button">Gửi đi</button>
+                                                            </form>
+                                                        </div>
+                                                    }
+                                                    <!-- End - Review Comment Reply-->
+                                                </li>
+                                                <!-- End - Review Comment list-->
+                                            }
+                                        }
+                                    </ul>
+                                    <!-- End - Review Comment -->
+                                </div>
+                            </div>
+                            <!-- End Product Details Tab Content Singel -->
+                        </div>
+                    </div>
+                    <!-- End Product Details Tab Content -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Product Content Tab Section -->
+<!-- Start Product Default Slider Section -->
+<div class="product-default-slider-section section-top-gap-100 section-fluid">
+    <!-- Start Section Content Text Area -->
+    <div class="section-title-wrapper" data-aos="fade-up" data-aos-delay="0">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-content-gap">
+                        <div class="secton-content">
+                            <h3 class="section-title">Cùng @Model.Genre.genre_name</h3>
+                            <p>
+                                Duyệt qua bộ sưu tập các sản phẩm liên quan của chúng tôi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Start Section Content Text Area -->
+    <div class="product-wrapper" data-aos="fade-up" data-aos-delay="0">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="product-slider-default-1row default-slider-nav-arrow">
+                        <!-- Slider main container -->
+                        <div class="swiper-container product-default-slider-4grid-1row">
+                            <!-- Additional required wrapper -->
+                            <div class="swiper-wrapper">
+                                <!-- Start Product Default Single Item -->
+                                @foreach (var item in relatedproduct)
+                                {
+                                    <div class="product-default-single-item product-color--golden swiper-slide">
+                                        <div class="image-box">
+                                            <a href="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.product_name)-@item.product_id"
+                                               class="image-link">
+                                                <img src="@item.image"
+                                                     alt="@item.product_name" />
+                                            </a>
+                                            @if (item.Discount.discount_star < DateTime.Now && item.Discount.discount_end > DateTime.Now && item.Discount.discount_price != 0)
+                                            {
+                                                <div class="tag">
+                                                    <span>-@((((item.price) /(item.price))-((item.price - item.Discount.discount_price)/(item.price))).ToString("0%"))</span>
+                                                </div>
+                                            }
+                                            <div class="action-link">
+                                                <div class="action-link-left">
+                                                    <input step="1" id="quantity" autocomplete="off" hidden value="1" type="number" />
+                                                    <a class="btnAddToCart" style="cursor:pointer;" data-id="@item.product_id">Thêm vào giỏ</a>
+                                                </div>
+                                                <div class="action-link-right">
+                                                    <a href="#" data-bs-toggle="modal">
+                                                        <i class="icon-magnifier"></i>
+                                                    </a>
+                                                    <a>
+                                                        <i class="icon-heart"></i>
+                                                    </a>
+                                                    <a>
+                                                        <i class="icon-shuffle"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="content">
+                                            <div class="text-center">
+                                                <h6 class="title">
+                                                    <a href="@SlugGenerator.SlugGenerator.GenerateSlug(item.product_name)-@item.product_id" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@item.product_name</a>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <ul class="review-star">
+                                                @{
+                                                    double _onestar = 1; int _c_onestar = 0; double _truestar = 2; int _c_truestar = 0;
+                                                    double _threestar = 3; int _c_threestar = 0; ; double _fourstar = 4; int _c_fourstar = 0;
+                                                    double _fivestar = 5; int _c_fivestar = 0; int _totalrating = 0; double _avg = 0;
+                                                    string _avgStar = "";
+                                                    foreach (var avgfb in listFeedback)
+                                                    {
+                                                        if (avgfb.product_id == item.product_id)
+                                                        {
+                                                            _totalrating++;
+                                                            if (avgfb.rate_star == 1)
+                                                            {
+                                                                _c_onestar++;
+                                                            }
+                                                            if (avgfb.rate_star == 2)
+                                                            {
+                                                                _c_truestar++;
+                                                            }
+                                                            if (avgfb.rate_star == 3)
+                                                            {
+                                                                _c_threestar++;
+                                                            }
+                                                            if (avgfb.rate_star == 4)
+                                                            {
+                                                                _c_fourstar++;
+                                                            }
+                                                            if (avgfb.rate_star == 5)
+                                                            {
+                                                                _c_fivestar++;
+                                                            }
+                                                        }
+                                                    }
+                                                    _avg = (_onestar * _c_onestar / _totalrating) + (_truestar * _c_truestar / _totalrating) + (_threestar * _c_threestar / _totalrating) +
+                                                                                        (_fourstar * _c_fourstar / _totalrating) + (_fivestar * _c_fivestar / _totalrating);
+                                                    if (_avg >= 1 && _avg < 2)
+                                                    {
+                                                        _avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>";
+                                                    }
+                                                    else if ((_avg >= 2) && (_avg < 3))
+                                                    {
+                                                        _avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>";
+                                                    }
+                                                    else if ((_avg >= 3) && (_avg < 4))
+                                                    {
+                                                        _avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>";
+                                                    }
+                                                    else if ((_avg >= 4) && (_avg < 5))
+                                                    {
+                                                        _avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>";
+                                                    }
+                                                    else if (_avg == 5)
+                                                    {
+                                                        _avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='fill'><i class='ion-android-star'></i></li>";
+                                                    }
+                                                    else
+                                                    {
+                                                        _avgStar = "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>" +
+                                                                                                   "<li class='empty'><i class='ion-android-star'></i></li>";
+                                                    }
+                                                }
+                                                @Html.Raw(_avgStar)
+                                            </ul>
+                                        </div>
+                                        <div class="text-center">
+                                            @if (item.Discount.discount_star < DateTime.Now && item.Discount.discount_end > DateTime.Now && item.Discount.discount_price != 0)
+                                            {
+                                                <span class="price"><del style="font-size:15px; margin-right:7px;">@item.price.ToString("#,0₫", culture.NumberFormat)</del><span style="color: #000; font-size: 17px; font-weight: 600;">@((item.price - item.Discount.discount_price).ToString("#,0₫", culture.NumberFormat))</span></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="price" style="font-size: 17px; color: #000; font-weight: 600;">@item.price.ToString("#,0₫", culture.NumberFormat)</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <!-- End Product Default Single Item -->
+                            </div>
+                        </div>
+                        <!-- If we need navigation buttons -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Product Default Slider Section -->
+@section scripts{
+    <script src="~/Scripts/UserJS/add-to-cart.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/module.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/hotkeys.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/dompurify.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/simditor.js"></script>
+    <script type="text/javascript" src="~/Scripts/UserJS/simditor/mobilecheck.js"></script>
+    <script src="~/Scripts/UserJS/comment-reply-product.js"></script>
+    <script>
+        var fbButton = document.getElementById("fb-share-button");
+        var url = window.location.href;
+        fbButton.addEventListener("click", function () {
+            window.open(
+                "https://www.facebook.com/sharer/sharer.php?u=" + url,
+                "facebook-share-dialog",
+                "width=600,height=600"
+            );
+            return false;
+        });
+
+    </script>
+}

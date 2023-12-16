@@ -1,0 +1,140 @@
+﻿@model  IEnumerable<DoAn_LapTrinhWeb.Model.Oder_Detail>
+@{
+    ViewBag.Title = "Chi tiết đơn hàng #"+ ViewBag.OrderID;
+    Layout = "~/Views/Shared/Main_Layout.cshtml";
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+    var order = (DoAn_LapTrinhWeb.Model.Order)ViewBag.Order;
+    double total2 = 0;
+}
+<!-- ...:::: Start Breadcrumb Section:::... -->
+<div class="breadcrumb-section breadcrumb-bg-color--black">
+    <div class="breadcrumb-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                        <nav aria-label="breadcrumb">
+                            <ul>
+                                <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
+                                <li><a href="#">Tài khoản</a></li>
+                                <li><a href="@Url.Action("TrackingOrder","Account")">Lịch sử mua hàng</a></li>
+                                <li class="active" aria-current="page">
+                                    Chi tiết đơn hàng
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ...:::: End Breadcrumb Section:::... -->
+<!-- ...:::: Start Account Dashboard Section:::... -->
+<div class="account-dashboard">
+    <div class="container">
+        <div class="row">
+            @Html.Partial("Dashboard")
+            <div class="col-sm-12 col-md-9 col-lg-9">
+                <!-- Tab panes -->
+                <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="0">
+                    <div class="table_desc">
+                        <div class="table_page table-responsive" >
+                            <table>
+                                <!-- Start Cart Table Head -->
+                                <thead>
+                                    <tr>
+                                        <th class="product_name">Sản phẩm</th>
+                                        <th class="product_thumb">Ảnh</th>
+                                        <th class="product-price">Giá</th>
+                                        <th class="product_quantity">Số Lượng</th>
+                                        <th class="product_total">Thành tiền</th>
+                                    </tr>
+                                </thead> <!-- End Cart Table Head -->
+                                <tbody>
+                                    <!-- Start Cart Single Item-->
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr class="item">
+                                            <td class="product_name">
+                                                <a href="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.Product.product_name)-@item.product_id">@item.Product.product_name</a>
+                                            </td>
+                                            <td class="product_thumb">
+                                                <a href="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.Product.product_name)-@item.product_id">
+                                                    <img src="@item.Product.image" alt="@item.product_id">
+                                                </a>
+                                            </td>
+                                            <td class="product-price text-danger">
+                                                @item.price.ToString("#,0₫", culture.NumberFormat)
+                                            </td>
+                                            <td class="product_quantity">
+                                                 @item.quantity
+                                            </td>
+                                            <td class="product_total">
+                                                @{
+                                                    total2 += item.quantity * item.price;
+                                                    double total1= item.quantity * item.price;
+                                                }
+                                                @total1.ToString("#,0₫", culture.NumberFormat)
+                                            </td>
+                                        </tr>
+                                    }
+                                    <!-- End Cart Single Item-->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-end">
+            <div class="col-lg-4 col-md-4">
+                <div class="coupon_code right" data-aos="fade-up" data-aos-delay="400">
+                    <h3>Địa chỉ nhận hàng</h3>
+                    <div class="coupon_inner">
+                        <div class="cart_subtotal">
+                            <p>Họ tên</p>
+                            <p style="font-size:16px;" class="cart_amount">@order.OrderAddress.orderUsername</p>
+                        </div>
+                        <div class="cart_subtotal">
+                            <p>Số điện thoại</p>
+                            <p style="font-size:16px;" class="cart_amount">@order.OrderAddress.orderPhonenumber</p>
+                        </div>
+                        <div style="font-weight:500">
+                            <p>Địa chỉ:</p>
+                            <p style="font-size:16px;" class="cart_amount">
+                                Tổ 10 ấp phước hiệp @order.OrderAddress.content, @order.OrderAddress.Wards.type @order.OrderAddress.Wards.ward_name,
+                                @order.OrderAddress.Districts.type @order.OrderAddress.Districts.district_name, @order.OrderAddress.Provinces.province_name
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <div class="coupon_code right" data-aos="fade-up" data-aos-delay="400">
+                    <h3>Tóm tắt</h3>
+                    <div class="coupon_inner">
+                        <div class="cart_subtotal">
+                            <p>Tạm tính</p>
+                            <p style="font-size:16px;" class="cart_amount">@total2.ToString("#,0₫", culture.NumberFormat)</p>
+                        </div>
+                        <div class="cart_subtotal">
+                            <p>Giảm giá</p>
+                            <p style="font-size:16px;" id="discount" class="cart_amount">@((total2 + 30000 - order.total).ToString("#,0₫", culture.NumberFormat))</p>
+                        </div>
+                        <div class="cart_subtotal ">
+                            <p>Phí vận chuyển</p>
+                            <p style="font-size:16px;" class="cart_amount">30.000₫</p>
+                        </div>
+                        <hr />
+                        <div class="cart_subtotal">
+                            <p>Thành tiền</p>
+                            <p style="font-size: 20px; color: rgb(235, 33, 1);" class="cart_amount">@order.total.ToString("#,0₫", culture.NumberFormat)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ...:::: End Account Dashboard Section:::... -->

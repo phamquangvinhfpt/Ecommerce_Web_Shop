@@ -1,0 +1,323 @@
+﻿@using DoAn_LapTrinhWeb.Common.Helpers
+@model DoAn_LapTrinhWeb.Models.Account
+@{
+    ViewBag.Title = "Thanh toán đơn hàng";
+    Layout = "~/Views/Shared/Main_Layout.cshtml";
+    List<int> quans = ViewBag.Quans as List<int>;
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+    var listProduct = (List<DoAn_LapTrinhWeb.Models.Product>)ViewBag.ListProduct;
+    var listAddress = (List<DoAn_LapTrinhWeb.Models.AccountAddress>)ViewBag.ListAddress;
+    var listProvince = (List<DoAn_LapTrinhWeb.Models.Provinces>)ViewBag.ListProvince;
+    var listDistrict = (List<DoAn_LapTrinhWeb.Models.Districts>)ViewBag.ListDistrict;
+    var listWard = (List<DoAn_LapTrinhWeb.Models.Wards>)ViewBag.ListWard;
+    var myAddress = (DoAn_LapTrinhWeb.Models.AccountAddress)ViewBag.MyAddress;
+    var discountPrice = Convert.ToDouble(ViewBag.Discount);
+    var total = Convert.ToDouble(ViewBag.Total);    // Giá sau khi áp dụng mã giảm giá, được tính ở controller
+    var price = total + discountPrice;  // giá gốc trước khi giảm
+    var shippingFee = 30000d;           // Phí vận chuyển 30k
+    total += shippingFee;
+    TempData["Total"] = total;
+}
+<style>
+    .nice-select {
+        display: none !important;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+@section scripts{
+    <script src="~/Scripts/UserJS/address-manager.js"></script>
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- ...:::: Start Breadcrumb Section:::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--black">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                                    <li><a href="@Url.Action("ViewCart", "Cart")">Giỏ hàng</a></li>
+                                    <li class="active" aria-current="page">
+                                        Thanh toán
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Breadcrumb Section:::... -->
+    <!-- ...:::: Start Checkout Section:::... -->
+    <div class="checkout-section">
+        <div class="container">
+            <!-- Start User Details Checkout Form -->
+            <div class="checkout_form" data-aos="fade-up" data-aos-delay="0">
+                <form method="post" action="@Url.Action("SaveOrder", "Cart")">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            <h3>Thông tin nhận hàng</h3>
+                            <div class="row">
+                                @if (ViewBag.CountAddress > 0)//view này hiển thị khi bạn đã thêm địa chỉ trước đó trong trang cá nhân
+                                {
+                                    <div class="col-lg-12">
+                                        <label for="country" style="font-weight:500">Tỉnh/ Thành phố <span class="text-danger">*</span></label>
+                                        <div class="default-form-box">
+                                            <select class="d-block form-select form-select-solid" name="province_id" id="province" style=" border: 1px solid #ededed; border-radius: 3px; color: #777;">
+                                                <option value="">Tỉnh/ Thành phố</option>
+                                                @foreach (var province in listProvince)
+                                                {
+                                                    <option @(province.province_id == myAddress.province_id ? "selected" : "") value="@province.province_id">@province.province_name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label style="font-weight:500">Quận/ Huyện <span class="text-danger">*</span></label>
+                                        <div class="default-form-box">
+                                            <select id="district" name="district_id" class="d-block form-select form-select-solid" style=" border: 1px solid #ededed; border-radius: 3px; color: #777;">
+                                                <option value="">Quận/ Huyện</option>
+                                                @foreach (var district in listDistrict)
+                                                {
+                                                    if (district.province_id == myAddress.province_id)
+                                                    {
+                                                        <option @(district.district_id == myAddress.district_id ? "selected" : "") value="@district.district_id">@district.type @district.district_name</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label style="font-weight:500">Phường/ xã <span class="text-danger">*</span></label>
+                                        <div class="default-form-box">
+                                            <select id="ward" name="ward_id" class="d-block form-select form-select-solid" style=" border: 1px solid #ededed; border-radius: 3px; color: #777;">
+                                                <option value="">Phường/ Xã</option>
+                                                @foreach (var ward in listWard)
+                                                {
+                                                    if (ward.district_id == myAddress.district_id)
+                                                    {
+                                                        <option @(ward.ward_id == myAddress.ward_id ? "selected" : "") value="@ward.ward_id">@ward.type @ward.ward_name</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label style="font-weight:500">Họ tên người nhận <span class="text-danger">*</span></label>
+                                        <div class="default-form-box">
+                                            <input type="text" id="user-name" name="orderUsername" value="@myAddress.accountUsername">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label style="font-weight:500">Số điện thoại <span class="text-danger">*</span></label>
+                                        <div class="default-form-box">
+                                            <input type="number" min="1" id="phone-number" name="orderPhonenumber" value="@myAddress.accountPhoneNumber">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label style="font-weight:500">Địa chỉ cụ thể <span class="text-danger">*</span></label>
+                                        <div class="default-form-box">
+                                            <input type="text" name="content" id="content" value="@myAddress.content">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="checkbox-default" for="newShipping" data-bs-toggle="collapse"
+                                               data-bs-target="#anotherShipping">
+                                            <input type="checkbox" id="newShipping">
+                                            <span>Gửi đến một địa chỉ khác?</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <div class="order-notes">
+                                            <label for="OrderNote" style="font-weight:500">Ghi chú đơn hàng</label>
+                                            <textarea name="OrderNote" placeholder="Ghi chú về đơn đặt hàng của bạn, ví dụ: những lưu ý đặc biệt khi giao hàng."></textarea>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-12 text-center">
+                                        <button style="margin-top: 20px; font-weight: 600; color: #FE8C23; font-size:19px;" id="popupcreateaddress" type="button">Thêm mới địa chỉ</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <h3>Đơn đặt hàng của bạn</h3>
+                            <div class="order_table table-responsive" style="overflow-x: hidden; border-left: 0.5px solid #0000001c; border-right: 0.5px solid #0000001c; border-top: 0.5px solid #0000001c;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Sản Phẩm</th>
+                                            <th>Tổng Giá</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < listProduct.Count(); i++)
+                                        {
+                                            var item = listProduct.ElementAt(i);
+                                            var quan = quans[i];
+                                            var price2 = item.price;
+                                            int maxquantity = Int32.Parse(item.quantity);
+                                            if (item.Discount.discount_star < DateTime.Now && item.Discount.discount_end > DateTime.Now)
+                                            {
+                                                price2 = item.price - item.Discount.discount_price;
+                                            }
+                                            <tr>
+                                                <td style="max-width:500px!important;"> <a target="_blank" href="~/@SlugGenerator.SlugGenerator.GenerateSlug(item.product_name)-@item.product_id">@item.product_name <strong style="color: #3674ab;"> × @quan</strong></a></td>
+                                                <td>
+                                                    @{
+                                                        double total3 = 0;
+                                                        total3 = price2 * quan;
+                                                    }
+                                                    <span>
+                                                        @total3.ToString("#,0₫", culture.NumberFormat)
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot style="font-weight:500">
+                                        <tr>
+                                            <th>Tạm tính</th>
+                                            <td>@price.ToString("#,0₫", culture.NumberFormat)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Giảm giá</th>
+                                            <td>@discountPrice.ToString("#,0₫", culture.NumberFormat)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Phí vận chuyển</th>
+                                            <td>@shippingFee.ToString("#,0₫", culture.NumberFormat)</td>
+                                        </tr>
+                                        <tr class="order_total">
+                                            <th>Thành tiền</th>
+                                            <td style="font-size:20px;color:rgb(235, 33, 1);">@total.ToString("#,0₫", culture.NumberFormat)</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="payment_method">
+                                <div class="order_button d-flex justify-content-end">
+                                    <button class="btn btn-md btn-black-default-hover" id="save-order" type="button">
+                                        Đặt hàng ngay
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div> <!-- Start User Details Checkout Form -->
+        </div>
+    </div>
+    <!-- ...:::: End Checkout Section:::... -->
+}
+<!--begin::create address-->
+<div class="modal fade create_modal" id="ModalCreate">
+    <div class="modal-dialog modal-dialog-centered" style=" min-width: 300px !important; max-width: 600px !important;" role="document">
+        <div class="modal-content">
+            <div class="modal-header pb-0 border-0 justify-content-end">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closemodal3">
+                    <span aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                            <g transform="translate(12.000000, 12.000000) rotate(-45.000000) translate(-12.000000, -12.000000) translate(4.000000, 4.000000)" fill="#000000">
+                                <rect fill="#000000" x="0" y="7" width="16" height="2" rx="1"></rect>
+                                <rect fill="#000000" opacity="0.5" transform="translate(8.000000, 8.000000) rotate(-270.000000) translate(-8.000000, -8.000000)" x="0" y="7" width="16" height="2" rx="1"></rect>
+                            </g>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="create_address">
+                    <div class="mb-4 text-center">
+                        <!--begin::Title-->
+                        <h1 class="mb-3">Thêm mới địa chỉ</h1>
+                        <!--end::Title-->
+                        <!--begin::Description-->
+                        <!--end::Description-->
+                    </div>
+                    <div class="d-flex flex-column mb-3 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 mb-1">
+                            <span class="required">Họ tên<span class="ms-1 text-danger">*</span></span>
+                        </label>
+                        <!--end::Label-->
+                        <input type="text" maxlength="20" class="form-control form-control-solid d-block" id="address_name" autocomplete="off" value="@User.Identity.GetName()" placeholder="Nhập họ tên" name="accountUsername">
+                    </div>
+                    <div class="d-flex flex-column mb-3 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 mb-1">
+                            <span class="required">Số điện thoại<span class="ms-1 text-danger">*</span></span>
+                        </label>
+                        <!--end::Label-->
+                        <input type="number" maxlength="10" class="form-control form-control-solid d-block" id="address_phone" placeholder="Số điện thoại" value="" name="accountPhoneNumber">
+                    </div>
+                    <div class="d-flex flex-column mb-3 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 mb-1">
+                            <span class="required">Tỉnh/Thành Phố<span class="ms-1 text-danger">*</span></span>
+                        </label>
+                        <!--end::Label-->
+                        <select name="province_id" id="province" class="form-select form-select-solid select2-hidden-accessible d-block">
+                            <option value="">Tỉnh/ Thành Phố</option>
+                            @foreach (var provice in listProvince)
+                            {
+                                <option value="@provice.province_id">@provice.province_name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="d-flex flex-column mb-3 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 mb-1">
+                            <span class="required">Quận/ Huyện<span class="ms-1 text-danger">*</span></span>
+                        </label>
+                        <!--end::Label-->
+                        <select disabled id="district" name="district_id" class="form-select form-select-solid select2-hidden-accessible cursor-disable d-block">
+                            <option value="">Quận/ Huyện</option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-column mb-3 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 mb-1">
+                            <span class="required">Phường/ Xã<span class="ms-1 text-danger">*</span></span>
+                        </label>
+                        <!--end::Label-->
+                        <select disabled name="ward_id" id="ward" class="form-select form-select-solid select2-hidden-accessible cursor-disable d-block">
+                            <option value="">Phường/ Xã</option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-column mb-3 fv-row fv-plugins-icon-container">
+                        <!--begin::Label-->
+                        <label class="d-flex align-items-center fs-6 mb-1">
+                            <span class="required">Địa chỉ cụ thể<span class="ms-1 text-danger">*</span></span>
+                        </label>
+                        <!--end::Label-->
+                        <input type="text" maxlength="50" class="form-control form-control-solid" id="address_content" placeholder="Nhập địa chỉ cụ thể" name="content">
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" hidden name="isDefault" checked="checked" value="true" id="checkeddefault" />
+                        <input type="hidden" value="false" name="account_address_default" />
+                    </div>
+                    <div class="text-danger fs-14px mb-4">*Những mục đánh dấu màu đỏ là bắt buộc</div>
+                    <div class="text-center custom-btn-address">
+                        <button type="reset" class="btn btn-secondary" id="closemodal3" style="margin-right:10px;">Hủy</button>
+                        <button type="button" onclick="SaveAddress()" class="btn btn-primary">
+                            <span class="indicator-label">Lưu</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::create address-->

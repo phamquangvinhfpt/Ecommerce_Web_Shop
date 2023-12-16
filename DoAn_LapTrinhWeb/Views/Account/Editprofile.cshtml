@@ -1,0 +1,99 @@
+﻿
+@model DoAn_LapTrinhWeb.Models.Account
+@{
+    ViewBag.Title = "Thông tin cá nhân";
+    Layout = "~/Views/Shared/Main_Layout.cshtml";
+
+}
+@using DoAn_LapTrinhWeb.Common.Helpers
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- ...:::: Start Breadcrumb Section:::... -->
+    <div class="breadcrumb-section breadcrumb-bg-color--black">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
+                            <nav aria-label="breadcrumb">
+                                <ul>
+                                    <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
+                                    <li>
+                                        <a href="#">Tài khoản</a>
+                                    </li>
+                                    <li class="active" aria-current="page">
+                                        Thông tin tài khoản
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Breadcrumb Section:::... -->
+    <!-- ...:::: Start Account Dashboard Section:::... -->
+    <div class="account-dashboard">
+        <div class="container">
+            <div class="row">
+                @Html.Partial("Dashboard")
+                <div class="col-sm-12 col-md-7 col-lg-7">
+                    <!-- Tab panes -->
+                    <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="0">
+                        <div id="account-details">
+                            <h3>Chi Tiết Tài Khoản </h3>
+                            <div class="login">
+                                <div class="login_form_container">
+                                    <div class="account_login_form">
+                                        <form id="Updatename" method="post">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <div class="default-form-box mb-20">
+                                                <label>Email</label>
+                                                <input type="text" class="cursor-disable" readonly value="@User.Identity.GetEmail()">
+                                            </div>
+                                            <div class="default-form-box mb-20">
+                                                <label>Họ tên<span class="text-danger">*</span></label>
+                                                <input type="text" id="Name" value="@Model.Name">
+                                            </div>
+                                            <div class="default-form-box mb-20">
+                                                <label>Số điện thoại<span class="text-danger">*</span></label>
+                                                <input type="number" id="Phone" value="@Model.Phone.TrimEnd()">
+                                            </div>
+                                            <div class="save_button mt-3">
+                                                <button class="btn btn-md btn-black-default-hover" id="save-form"
+                                                        type="button">
+                                                    Lưu
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-2 col-lg-2 d-flex align-items-center" data-aos="fade-up" data-aos-delay="50">
+                    <div class="form-input">
+                        <div class="preview">
+                            <img id="file-ip-1-preview" src="@Model.Avatar">
+                        </div>
+                        <label for="file-ip-1">Thay đổi</label>
+                        <input type="file" id="file-ip-1" accept=".jpg,.png,.jpeg" onchange="uploadFile(event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ...:::: End Account Dashboard Section:::... -->
+}
+@section scripts{
+    <script src="~/Scripts/UserJS/accounts.js"></script>
+}
