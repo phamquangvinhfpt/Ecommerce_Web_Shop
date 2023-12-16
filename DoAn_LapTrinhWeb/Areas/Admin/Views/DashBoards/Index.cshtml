@@ -420,7 +420,7 @@
                 <!--begin::Card widget 6-->
                 <div class="card card-flush h-md-50 mb-5 mb-xl-10">
                     <!--begin::Header-->
-                    <div class="card-header pt-5">
+                    <div class="card-header pt-5" style="height:200px">
                         <!--begin::Title-->
                         <div class="card-title d-flex flex-column">
                             <!--begin::Info-->
@@ -432,16 +432,16 @@
                                 <span class="fs-2hx fw-bolder text-dark me-2 lh-1">@Order.Where(m => m.oder_date.Day == DateTime.Now.Day && m.oder_date.Month == DateTime.Now.Month && m.oder_date.Year == DateTime.Now.Year).Sum(m => m.total).ToString("#,0", culture.NumberFormat)</span>
                                 <!--end::Amount-->
                                 <!--begin::Badge-->
-                                <span class="badge badge-success fs-6 lh-1 py-1 px-2 d-flex flex-center" style="height: 22px">
+                                <!--<span class="badge badge-success fs-6 lh-1 py-1 px-2 d-flex flex-center" style="height: 22px">-->
                                     <!--begin::Svg Icon | path: icons/duotune/arrows/arr067.svg-->
-                                    <span class="svg-icon svg-icon-7 svg-icon-white ms-n1">
+                                    <!--<span class="svg-icon svg-icon-7 svg-icon-white ms-n1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                             <path opacity="0.5" d="M13 9.59998V21C13 21.6 12.6 22 12 22C11.4 22 11 21.6 11 21V9.59998H13Z" fill="black" />
                                             <path d="M5.7071 7.89291C5.07714 8.52288 5.52331 9.60002 6.41421 9.60002H17.5858C18.4767 9.60002 18.9229 8.52288 18.2929 7.89291L12.7 2.3C12.3 1.9 11.7 1.9 11.3 2.3L5.7071 7.89291Z" fill="black" />
                                         </svg>
-                                    </span>
-                                    <!--end::Svg Icon-->2.6%
-                                </span>
+                                    </span>-->
+                                    <!--end::Svg Icon--><!--2.6%
+                                </span>-->
                                 <!--end::Badge-->
                             </div>
                             <!--end::Info-->
@@ -453,63 +453,43 @@
                     </div>
                     <!--end::Header-->
                     <!--begin::Card body-->
-                    <!--<div class="card-body d-flex align-items-end px-0 pb-0">-->
+                    <div class="card-body d-flex align-items-end px-0 pb-0">
                         <!--begin::Chart-->
-                        <!--<div id="kt_card_widget_6_chart" class="w-100" style="height: 80px"></div>-->
+                        @*<div id="kt_card_widget_6_chart" class="w-100" style="height: 80px"></div>*@
                         <!--end::Chart-->
-                    <!--</div>-->
+                    </div>
                     <!--end::Card body-->
                 </div>
                 <!--end::Card widget 6-->
-                <!--begin::Card widget 7-->
-                <!--<div class="card card-flush h-md-50 mb-xl-10">-->
+                @*begin::Card widget 7*@
+                <div class="card card-flush h-md-50 mb-xl-10">
                     <!--begin::Header-->
-                    <!--<div class="card-header pt-5">-->
+                    <div class="card-header pt-5">
                         <!--begin::Title-->
-                        <!--<div class="card-title d-flex flex-column">-->
+                        <div class="card-title d-flex flex-column">
                             <!--begin::Amount-->
-                            <!--<span class="fs-2hx fw-bolder text-dark me-2 lh-1">6.3k</span>-->
+                            <span class="fs-2hx fw-bolder text-dark me-2 lh-1">@ViewBag.SoNguoiTruyCap</span>
                             <!--end::Amount-->
                             <!--begin::Subtitle-->
-                            <!--<span class="text-gray-400 pt-1 fw-bold fs-6">Khách ghé thăm trong tháng</span>-->
+                            <span class="text-gray-400 pt-1 fw-bold fs-6">Số người truy cập</span>
                             <!--end::Subtitle-->
-                        <!--</div>-->
+                        </div>
                         <!--end::Title-->
-                    <!--</div>-->
+                    </div>
                     <!--end::Header-->
                     <!--begin::Card body-->
-                    <!--<div class="card-body d-flex flex-column justify-content-end">-->
+                    <div class="card-body d-flex flex-column justify-content-end">
                         <!--begin::Title-->
-                        <!--<span class="fs-6 fw-boldest text-gray-800 d-block mb-2">Online hôm nay</span>-->
+                        <span class="fs-6 fw-boldest text-gray-800 d-block mb-2">Online hôm nay</span>
                         <!--end::Title-->
                         <!--begin::Users group-->
-                        <!--<div class="symbol-group symbol-hover">
-                            <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Alan Warden">
-                                <span class="symbol-label bg-warning text-inverse-warning fw-bolder">A</span>
-                            </div>
-                            <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Michael Eberon">
-                                <img alt="Pic" src="/Images/Admin/assets/media/avatars/300-11.jpg" />
-                            </div>
-                            <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Susan Redwood">
-                                <span class="symbol-label bg-primary text-inverse-primary fw-bolder">S</span>
-                            </div>
-                            <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Melody Macy">
-                                <img alt="Pic" src="/Images/Admin/assets/media/avatars/300-2.jpg" />
-                            </div>
-                            <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Perry Matthew">
-                                <span class="symbol-label bg-danger text-inverse-danger fw-bolder">P</span>
-                            </div>
-                            <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" title="Barry Walter">
-                                <img alt="Pic" src="/Images/Admin/assets/media/avatars/300-12.jpg" />
-                            </div>
-                            <a href="#" class="symbol symbol-35px symbol-circle" data-bs-toggle="modal" data-bs-target="#kt_modal_view_users">
-                                <span class="symbol-label bg-gray-900 text-gray-300 fs-8 fw-bolder">+42</span>
-                            </a>
-                        </div>-->
+                        <div class="symbol-group symbol-hover">
+                            <h3>@ViewBag.SoNguoiDangOnline</h3>
+                        </div>
                         <!--end::Users group-->
-                    <!--</div>-->
+                    </div>
                     <!--end::Card body-->
-                <!--</div>-->
+                </div>
                 <!--end::Card widget 7-->
             </div>
         </div>

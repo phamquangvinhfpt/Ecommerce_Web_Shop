@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,6 +13,8 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
         // GET: Admin/DashBoards
         public ActionResult Index()
         {
+            ViewBag.SoNguoiTruyCap = HttpContext.Application["SoNguoiTruyCap"].ToString();
+            ViewBag.SoNguoiDangOnline = HttpContext.Application["SoNguoiDangOnline"].ToString();
             ViewBag.Order = db.Orders.ToList();
             ViewBag.OrderDetail = db.Oder_Detail.ToList();
             ViewBag.ListOrderDetail = db.Oder_Detail.OrderByDescending(m => m.create_at).Take(3).ToList();
