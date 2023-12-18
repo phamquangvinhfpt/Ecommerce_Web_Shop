@@ -102,7 +102,7 @@ namespace DoAn_LapTrinhWeb.Controllers
                 return View();
             }
             account.Role = Const.ROLE_MEMBER_CODE; //admin quyền là 0: thành viên quyền là 1             
-            account.status = "1";
+            account.status = "0"; //0 là khoá 1 là mở
             account.Role = 1;
             account.Email = model.Email;
             account.create_by = model.Email;
@@ -116,10 +116,80 @@ namespace DoAn_LapTrinhWeb.Controllers
             account.create_at = DateTime.Now; //thời gian tạo tạo khoản
             db.Accounts.Add(account);
             db.SaveChanges(); //add dữ liệu vào database
-            success = "<script>alert('Đăng ký thành công');</script>";
+            success = "<script>alert('Đăng ký thành công vui lòng kiểm tra email');</script>";
             ViewBag.Success = success;
             ViewBag.Fail = fail;
+            string ConfirmCode = Guid.NewGuid().ToString();
+            SendVerificationLinkEmailConfirmAccount(account.Email, ConfirmCode);
+            string email = account.Email;
+            account.Requestcode = ConfirmCode;
+            db.Configuration.ValidateOnSaveEnabled = false;
+            db.SaveChanges();
+            Notification.setNotification1_5s("Đăng ký thành công, vui lòng kiểm tra email để kích hoạt tài khoản", "success");
             return RedirectToAction("Login","Account");
+        }
+
+        //Gửi mail xác nhận đăng ký
+        [NonAction]
+        public void SendVerificationLinkEmailConfirmAccount(string emailID, string activationCode)
+        {
+            var verifyUrl = "/Account/ConfirmAccount/" + activationCode;
+            var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl);
+            var fromEmail = new MailAddress(EmailConfig.emailID, EmailConfig.emailName);
+            var toEmail = new MailAddress(emailID);
+            var fromEmailPassword = EmailConfig.emailPassword; //có thể thay bằng mật khẩu gmail của bạn
+            string body = System.IO.File.ReadAllText(HostingEnvironment.MapPath("~/EmailTemplate/") + "ConfirmAccount" + ".cshtml"); //dùng body mail html , file template nằm trong thư mục "EmailTemplate/Text.cshtml"
+            string subject = "Cập nhật mật khẩu mới";
+            body = body.Replace("{{viewBag.Confirmlink}}", link); //hiển thị nội dung lên form html
+            body = body.Replace("{{viewBag.Confirmlink}}", Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl));//hiển thị nội dung lên form html
+            var smtp = new SmtpClient
+            {
+                Host = EmailConfig.emailHost,
+                Port = 587,
+                EnableSsl = true, //bật ssl
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromEmail.Address, fromEmailPassword)
+            };
+
+            using (var message = new MailMessage(fromEmail, toEmail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
+        }
+
+        //Xác nhận tài khoản
+        public ActionResult ConfirmAccount(string id)
+        {
+            bool Status = false;
+            db.Configuration.ValidateOnSaveEnabled = false; // khai báo không kiểm tra dữ liệu trùng lặp
+            var v = db.Accounts.Where(m => m.Requestcode == id).FirstOrDefault();
+            if (v != null)
+            {
+                v.status = "1";
+                v.Requestcode = null;
+                db.SaveChanges();
+                Status = true;
+            }
+            else
+            {
+                ViewBag.Message = "Đã xảy ra lỗi";
+            }
+            ViewBag.Status = Status;
+            //set thông báo
+            if (Status)
+            {
+                Notification.setNotification1_5s("Kích hoạt tài khoản thành công", "success");
+            }
+            else
+            {
+                Notification.setNotification1_5s("Kích hoạt tài khoản thất bại", "error");
+            }
+            //return về trang login
+            return RedirectToAction("Login", "Account");
         }
         //View quên mật khẩu
         public ActionResult ForgotPassword()
