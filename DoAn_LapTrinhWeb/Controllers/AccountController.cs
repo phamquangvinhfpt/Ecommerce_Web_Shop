@@ -120,7 +120,7 @@ namespace DoAn_LapTrinhWeb.Controllers
             ViewBag.Success = success;
             ViewBag.Fail = fail;
             string ConfirmCode = Guid.NewGuid().ToString();
-            SendVerificationLinkEmailConfirmAccount(account.Email, ConfirmCode);
+            SendVerificationLinkEmailConfirmAccount(account.Email, ConfirmCode, account.Name);
             string email = account.Email;
             account.Requestcode = ConfirmCode;
             db.Configuration.ValidateOnSaveEnabled = false;
@@ -131,7 +131,7 @@ namespace DoAn_LapTrinhWeb.Controllers
 
         //Gửi mail xác nhận đăng ký
         [NonAction]
-        public void SendVerificationLinkEmailConfirmAccount(string emailID, string activationCode)
+        public void SendVerificationLinkEmailConfirmAccount(string emailID, string activationCode, string accountName)
         {
             var verifyUrl = "/Account/ConfirmAccount/" + activationCode;
             var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl);
@@ -140,8 +140,9 @@ namespace DoAn_LapTrinhWeb.Controllers
             var fromEmailPassword = EmailConfig.emailPassword; //có thể thay bằng mật khẩu gmail của bạn
             string body = System.IO.File.ReadAllText(HostingEnvironment.MapPath("~/EmailTemplate/") + "ConfirmAccount" + ".cshtml"); //dùng body mail html , file template nằm trong thư mục "EmailTemplate/Text.cshtml"
             string subject = "Cập nhật mật khẩu mới";
-            body = body.Replace("{{viewBag.Confirmlink}}", link); //hiển thị nội dung lên form html
-            body = body.Replace("{{viewBag.Confirmlink}}", Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl));//hiển thị nội dung lên form html
+            body = body.Replace("{{viewBag.clientName}}", accountName); // thay thế tên người nhận vào template
+            body = body.Replace("{{viewBag.Confirmlink}}", link); // thay thế link xác nhận vào template
+            body = body.Replace("{{viewBag.Confirmlink}}", Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl)); // thay thế link xác nhận vào template
             var smtp = new SmtpClient
             {
                 Host = EmailConfig.emailHost,
