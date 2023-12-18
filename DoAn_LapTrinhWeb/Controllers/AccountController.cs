@@ -139,7 +139,7 @@ namespace DoAn_LapTrinhWeb.Controllers
             var toEmail = new MailAddress(emailID);
             var fromEmailPassword = EmailConfig.emailPassword; //có thể thay bằng mật khẩu gmail của bạn
             string body = System.IO.File.ReadAllText(HostingEnvironment.MapPath("~/EmailTemplate/") + "ConfirmAccount" + ".cshtml"); //dùng body mail html , file template nằm trong thư mục "EmailTemplate/Text.cshtml"
-            string subject = "Cập nhật mật khẩu mới";
+            string subject = "Xác thực tài khoản!";
             body = body.Replace("{{viewBag.clientName}}", accountName); // thay thế tên người nhận vào template
             body = body.Replace("{{viewBag.Confirmlink}}", link); // thay thế link xác nhận vào template
             body = body.Replace("{{viewBag.Confirmlink}}", Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl)); // thay thế link xác nhận vào template
