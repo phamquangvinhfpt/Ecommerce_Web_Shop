@@ -16,6 +16,7 @@ namespace DoAn_LapTrinhWeb
             Application["Notification"] = "";
             Application["SoNguoiTruyCap"] = 0;
             Application["SoNguoiDangOnline"] = 0;
+
         }
 
         protected void Session_Start()

@@ -135,6 +135,8 @@ namespace DoAn_LapTrinhWeb.Controllers
         {
             var verifyUrl = "/Account/ConfirmAccount/" + activationCode;
             var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl);
+            //Thay localhost bằng domain kizspy.shop
+            link = link.Replace("http://localhost:44336", "https://kizspy.shop");
             var fromEmail = new MailAddress(EmailConfig.emailID, EmailConfig.emailName);
             var toEmail = new MailAddress(emailID);
             var fromEmailPassword = EmailConfig.emailPassword; //có thể thay bằng mật khẩu gmail của bạn

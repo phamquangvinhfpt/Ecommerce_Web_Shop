@@ -242,6 +242,7 @@
     <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
+    <Compile Include="Controllers\RouteController.cs" />
     <Compile Include="DbContext.cs" />
     <Compile Include="DTOs\ProductDTOs.cs" />
     <Compile Include="Global.asax.cs">
@@ -2445,6 +2446,7 @@
     <Folder Include="Images\Admin\General\Thumbnail\" />
     <Folder Include="Images\General\" />
     <Folder Include="obj\" />
+    <Folder Include="Views\Route\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="EmailTemplate\EmailOrders.cshtml" />
