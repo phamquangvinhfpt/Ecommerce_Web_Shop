@@ -46,6 +46,7 @@ namespace DoAn_LapTrinhWeb.Models
         [StringLength(100)]
         public string update_by { get; set; }
         public DateTime update_at { get; set; }
+        public virtual ICollection<Role> Roles { get; set; } // 1 account có nhiều role
         [StringLength(1)] public string status { get; set; }
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Feedback> Feedbacks { get; set; }

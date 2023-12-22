@@ -6,6 +6,7 @@ using DoAn_LapTrinhWeb.Common.Helpers;
 using DoAn_LapTrinhWeb.Models;
 using DoAn_LapTrinhWeb.Model;
 using PagedList;
+using DoAn_LapTrinhWeb.Common;
 
 namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
 {
@@ -63,6 +64,13 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
             return View(account);
         }
 
+        //return Ok if success
+        public JsonResult GetAllRole() // get all role
+        {
+            var list = db.Roles.ToList();
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult ChangeRoles(int accountID, int roleID)
         {
             var account = db.Accounts.FirstOrDefault(m => m.account_id == accountID);
@@ -75,6 +83,82 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
                     account.Role = roleID;
                     db.Configuration.ValidateOnSaveEnabled = false;
                     db.Entry(account).State = EntityState.Modified;
+                    db.SaveChanges();
+                    result = true;
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult AddNewRole(string roleName)
+        {
+            Role role = new Role();
+            bool result = false;
+            try
+            {
+                if (roleName != null)
+                {
+                    //check if role name is exist
+                    var check = db.Roles.FirstOrDefault(m => m.role_name == roleName);
+                    if (check == null)
+                    {
+                        role.role_name = roleName;
+                        db.Roles.Add(role);
+                        db.SaveChanges();
+                        result = true;
+                        return Json(result, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        return Json(result, JsonRequestBehavior.AllowGet);
+                    }
+                }
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult DeleteRole(int roleId)
+        {
+            Role role = db.Roles.FirstOrDefault(m => m.role_id == roleId);
+            bool result = false;
+            try
+            {
+                if (role != null)
+                {
+                    db.Roles.Remove(role);
+                    db.SaveChanges();
+                    result = true;
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult EditRole(int roleID, string roleName)
+        {
+            //update name of role
+            Role role = db.Roles.FirstOrDefault(m => m.role_id == roleID);
+            bool result = false;
+            try
+            {
+                if (role != null)
+                {
+                    role.role_name = roleName;
+                    db.Configuration.ValidateOnSaveEnabled = false;
+                    db.Entry(role).State = EntityState.Modified;
                     db.SaveChanges();
                     result = true;
                     return Json(result, JsonRequestBehavior.AllowGet);

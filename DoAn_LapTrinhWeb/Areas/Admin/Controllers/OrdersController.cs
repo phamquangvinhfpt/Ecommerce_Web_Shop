@@ -131,83 +131,104 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
         public ActionResult ExportExcel()
         {
             var wb = new ClosedXML.Excel.XLWorkbook();
-            var ws = wb.Worksheets.Add("Danh sách đơn hàng");
-            var ws1 = wb.Worksheets.Add("Tổng doanh thu");
-            //Đổ dữ liệu vào sheet danh sách đơn hàng và tổng doanh thu
+            //ws Doanh thu bán hàng từ ngày 1 đến ngày ... tháng ... năm ...
+            var ws = wb.Worksheets.Add("Doanh thu");
+            var ws1 = wb.Worksheets.Add("Sản phẩm bán ra");
+            //Tạo tiêu đề cho file excel
+            ws.Cell("A1").Value = "Doanh thu bán hàng từ ngày 1 đến ngày " + DateTime.Now.Day + " tháng " + DateTime.Now.Month + " năm " + DateTime.Now.Year;
+            ws1.Cell("A1").Value = "Thống kê sản phẩm bán ra từ ngày 1 đến ngày " + DateTime.Now.Day + " tháng " + DateTime.Now.Month + " năm " + DateTime.Now.Year;
+            //Đổ dữ liệu vào sheet Doanh thu và Sản phẩm bán ra
+
+            ws.Cell("A2").Value = "STT";
+            ws.Cell("A2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell("B2").Value = "Mã hóa đơn";
+            ws.Cell("B2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell("C2").Value = "Mã khách hàng";
+            ws.Cell("C2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell("D2").Value = "Tên khách hàng";
+            ws.Cell("D2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell("E2").Value = "Thời gian đặt hàng";
+            ws.Cell("E2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell("F2").Value = "Tổng tiền";
+            ws.Cell("F2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell("G2").Value = "Trạng thái";
+            ws.Cell("G2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
             var OrderList = db.Orders.Include("Account").Include("OrderAddress").Include("Oder_Detail").ToList();
-            //Add tên cột cho sheet danh sách đơn hàng = tên các thuộc tính trong model
-            ws.Cell(1, 1).Value = "Mã đơn hàng";
-            ws.Cell(1, 1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 2).Value = "Tên khách hàng";
-            ws.Cell(1, 2).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 3).Value = "Số điện thoại";
-            ws.Cell(1, 3).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 4).Value = "Địa chỉ";
-            ws.Cell(1, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 5).Value = "Ngày đặt hàng";
-            ws.Cell(1, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 6).Value = "Số lượng đơn";
-            ws.Cell(1, 6).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 7).Value = "Tổng tiền";
-            ws.Cell(1, 7).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(1, 8).Value = "Trạng thái";
-            ws.Cell(1, 8).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            //Add tên cột cho sheet tổng doanh thu = tên các thuộc tính trong model
-            ws1.Cell(1, 1).Value = "Tháng";
-            ws1.Cell(1, 1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws1.Cell(1, 2).Value = "Tổng tiền";
-            ws1.Cell(1, 2).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            //Add dữ liệu cho sheet danh sách đơn hàng
+
             for (int i = 0; i < OrderList.Count; i++)
             {
-                //Status trạng thái đơn hàng 1 = Đang chờ xử lý, 2 = Đang giao hàng, 3 = Đã giao hàng, 4 = Đã hủy
-                ws.Cell(i + 2, 1).Value = OrderList[i].order_id;
-                ws.Cell(i + 2, 1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-                ws.Cell(i + 2, 2).Value = OrderList[i].Account.Name;
-                ws.Cell(i + 2, 2).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-                ws.Cell(i + 2, 3).Value = OrderList[i].Account.Phone;
-                ws.Cell(i + 2, 3).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-                ws.Cell(i + 2, 4).Value = OrderList[i].OrderAddress.content;
-                ws.Cell(i + 2, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-                //format ngày tháng
-                ws.Cell(i + 2, 5).Value = OrderList[i].oder_date.ToString("dd/MM/yyyy");
-                ws.Cell(i + 2, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-                ws.Cell(i + 2, 6).Value = OrderList[i].Oder_Detail.Count;
-                ws.Cell(i + 2, 7).Value = OrderList[i].total;
-                ws.Cell(i + 2, 7).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-                ws.Cell(i + 2, 8).Value = OrderList[i].status == "1" ? "Đang chờ xử lý" : OrderList[i].status == "2" ? "Đang giao hàng" : OrderList[i].status == "3" ? "Đã giao hàng" : "Đã hủy";
+                ws.Cell(i + 3, 1).Value = i + 1;
+                ws.Cell(i + 3, 1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Cell(i + 3, 2).Value = OrderList[i].order_id;
+                ws.Cell(i + 3, 2).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Cell(i + 3, 3).Value = OrderList[i].account_id;
+                ws.Cell(i + 3, 3).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Cell(i + 3, 4).Value = OrderList[i].Account.Name;
+                ws.Cell(i + 3, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Cell(i + 3, 5).Value = OrderList[i].oder_date.ToString("dd/MM/yyyy");
+                ws.Cell(i + 3, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Cell(i + 3, 6).Value = OrderList[i].total;
+                ws.Cell(i + 3, 6).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Cell(i + 3, 7).Value = OrderList[i].status == "1" ? "Đang chờ xử lý" : OrderList[i].status == "2" ? "Đang giao hàng" : OrderList[i].status == "3" ? "Đã giao hàng" : "Đã hủy";
                 ws.Cell(i + 2, 8).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
             }
-            //Add thêm Tổng tiền thanh toán cho sheet danh sách đơn hàng
-            ws.Cell(OrderList.Count + 2, 6).Value = "Tổng tiền thanh toán";
-            ws.Cell(OrderList.Count + 2, 6).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-            ws.Cell(OrderList.Count + 2, 6).Style.Font.Bold = true;
-            //status = 3 thì mới tính tổng tiền thanh toán
-            ws.Cell(OrderList.Count + 2, 7).Value = OrderList.Where(m => m.status == "3").Sum(m => m.total);
-            //Add border cho sheet danh sách đơn hàng
+
+            //Add thêm Tổng tiền thanh toán cho sheet doanh thu
+            ws.Cell(OrderList.Count + 3, 5).Value = "Tổng tiền thanh toán";
+            ws.Cell(OrderList.Count + 3, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws.Cell(OrderList.Count + 3, 5).Style.Font.Bold = true;
+            ws.Cell(OrderList.Count + 3, 6).Value = OrderList.Where(m => m.status == "3").Sum(m => m.total);
+
+            //Add border cho sheet doanh thu
             ws.RangeUsed().Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
             ws.RangeUsed().Style.Border.InsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
-            //Add màu nền cho sheet danh sách đơn hàng
+            //Add màu nền cho sheet doanh thu
             ws.RangeUsed().Style.Fill.BackgroundColor = XLColor.LightGray;
             //Border cho table
             ws.Columns().AdjustToContents();
-            //Add dữ liệu cho sheet tổng doanh thu
-            var total = db.Orders.Where(m => m.status == "3").GroupBy(m => m.oder_date.Month).Select(m => new { month = m.Key, total = m.Sum(n => n.total) }).ToList();
-            for (int i = 0; i < total.Count; i++)
+            //Merge Cell cho sheet doanh thu
+            ws.Range("A1:G1").Merge();
+            //Adjust Cell A1 cho sheet doanh thu center
+            ws.Cell("A1").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+            //Đổ dữ liệu vào sheet sản phẩm bán ra
+            ws1.Cell("A2").Value = "STT";
+            ws1.Cell("A2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws1.Cell("B2").Value = "Tên sản phẩm";
+            ws1.Cell("B2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws1.Cell("C2").Value = "Số lượng bán";
+            ws1.Cell("C2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+            ws1.Cell("D2").Value = "Số đơn hàng";
+            ws1.Cell("D2").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+            var ProductList = db.Products.Include("Oder_Detail").ToList();
+            var ListProductHasOrder = ProductList.Where(m => m.Oder_Detail.Count > 0).ToList();
+
+            for (int i = 0; i < ListProductHasOrder.Count; i++)
             {
-                ws1.Cell(i + 2, 1).Value = total[i].month;
-                ws1.Cell(i + 2, 2).Value = total[i].total;
+                    ws1.Cell(i + 3, 1).Value = i + 1;
+                    ws1.Cell(i + 3, 1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                    ws1.Cell(i + 3, 2).Value = ListProductHasOrder[i].product_name;
+                    ws1.Cell(i + 3, 2).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                    ws1.Cell(i + 3, 3).Value = ListProductHasOrder[i].Oder_Detail.Sum(m => m.quantity);
+                    ws1.Cell(i + 3, 3).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                    ws1.Cell(i + 3, 4).Value = ListProductHasOrder[i].Oder_Detail.Count;
+                    ws1.Cell(i + 3, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
             }
-            //Add thêm tổng doanh thu của 12 tháng cho sheet tổng doanh thu
-            ws1.Cell(total.Count + 2, 1).Value = "Tổng doanh thu";
-            ws1.Cell(total.Count + 2, 1).Style.Font.Bold = true;
-            ws1.Cell(total.Count + 2, 2).Value = OrderList.Where(m => m.status == "3").Sum(m => m.total);
-            //Add border cho sheet tổng doanh thu
+
+            //Add border cho sheet sản phẩm bán ra
             ws1.RangeUsed().Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
             ws1.RangeUsed().Style.Border.InsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
-            //Add màu nền cho sheet tổng doanh thu
+            //Add màu nền cho sheet sản phẩm bán ra
             ws1.RangeUsed().Style.Fill.BackgroundColor = XLColor.LightGray;
+            //Border cho table
             ws1.Columns().AdjustToContents();
+            //Merge Cell cho sheet sản phẩm bán ra
+            ws1.Range("A1:D1").Merge();
+            //Adjust Cell A1 cho sheet sản phẩm bán ra center
+            ws1.Cell("A1").Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
             string nameFile = "ExportOrder_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx";
             string path = Path.Combine(Server.MapPath("~/Content/Export/"), nameFile);
             using (var stream = new MemoryStream())

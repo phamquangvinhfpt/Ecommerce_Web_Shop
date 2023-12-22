@@ -252,6 +252,10 @@
     <Compile Include="Migrations\202202200721499_model3.Designer.cs">
       <DependentUpon>202202200721499_model3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202312211403010_InitialCreateRole.cs" />
+    <Compile Include="Migrations\202312211403010_InitialCreateRole.designer.cs">
+      <DependentUpon>202312211403010_InitialCreateRole.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Account\AccountViewModels.cs" />
@@ -274,6 +278,7 @@
     <Compile Include="Models\Payment.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\Account\ResetPassword.cs" />
+    <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Wards.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -2459,6 +2464,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202202200721499_model3.resx">
       <DependentUpon>202202200721499_model3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202312211403010_InitialCreateRole.resx">
+      <DependentUpon>202312211403010_InitialCreateRole.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

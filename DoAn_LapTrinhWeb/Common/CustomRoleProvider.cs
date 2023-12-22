@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DoAn_LapTrinhWeb.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,24 @@ namespace DoAn_LapTrinhWeb.Common
 
 		public override void CreateRole(string roleName)
 		{
-			throw new NotImplementedException();
+			using (var db = new DbContext())
+			{
+				//check if role exist
+				var role = db.Roles.Where(x => x.role_name == roleName).FirstOrDefault();
+				if (role == null)
+				{
+					//create new role
+					db.Roles.Add(new Role()
+					{
+                        role_name = roleName
+                    });
+					db.SaveChanges();
+				}
+				else
+				{
+					throw new Exception("Role name is exist");
+				}
+            }
 		}
 
 		public override bool DeleteRole(string roleName, bool throwOnPopulatedRole)
@@ -33,7 +51,10 @@ namespace DoAn_LapTrinhWeb.Common
 
 		public override string[] GetAllRoles()
 		{
-			throw new NotImplementedException();
+			using (var db = new DbContext())
+			{
+                return db.Roles.Select(x => x.role_name).ToArray();
+            }
 		}
 
 		public override string[] GetRolesForUser(string userData)

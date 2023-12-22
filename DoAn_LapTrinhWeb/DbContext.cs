@@ -31,6 +31,7 @@ namespace DoAn_LapTrinhWeb
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Contact> Contacts { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
 
@@ -171,6 +172,11 @@ namespace DoAn_LapTrinhWeb
                 .WithRequired(e => e.Product)
                 .HasForeignKey(e => new {e.product_id, e.genre_id, e.disscount_id})
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Account>()
+                .HasMany(e => e.Roles)
+                .WithMany(e => e.Accounts)
+                .Map(m => m.ToTable("Account_Role").MapLeftKey("account_id").MapRightKey("role_id"));
         }
     }
 }

@@ -7,7 +7,20 @@
     string requestUrl = Request.Url.Scheme + "://" + Request.Url.Authority;
     string prePageIcon = "<i class='previous'></i>";
     string nextPageIcon = "<i class='next'></i>";
+
+    //Get all roles from database
+    using (var db = new DbContext())
+    {
+        var roles = db.Roles.ToList();
+        ViewBag.Roles = roles;
+    }
 }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <!--begin::toolbar-->
 <div class="toolbar" id="kt_toolbar">
     <!--begin::Container-->
@@ -73,6 +86,66 @@
                     <!--begin::Toolbar-->
                     <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
                         <!--begin::Filter-->
+                        <button type="button" class="btn btn-light-success me-3" data-toggle="modal" data-target="#exampleModal">
+                            <span class="svg-icon svg-icon-2">
+                                <svg class="svg-icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M947.2 813.568h-68.608c-13.312-25.6-37.376-76.8-37.376-103.936 0-10.752 4.096-16.384 11.776-26.624 13.312-17.92 31.744-42.496 31.744-108.032 0-66.56-53.76-120.32-120.32-120.32s-120.32 53.76-120.32 120.32c0 65.024 18.432 90.112 31.744 108.032 7.68 10.24 11.776 15.872 11.776 26.624 0 27.136-24.064 78.336-37.376 103.936h-87.04c-36.864 0-66.56 26.624-66.56 59.904v80.384c0 33.28 29.696 59.904 66.56 59.904h384c36.864 0 66.56-26.624 66.56-59.904v-80.384c0-32.768-29.696-59.904-66.56-59.904z m-228.864-103.936c0-20.992-9.216-33.28-17.92-45.056-12.288-16.384-25.6-34.304-25.6-89.6 0-49.152 40.448-89.6 89.6-89.6s89.6 40.448 89.6 89.6c0 54.784-13.824 73.216-25.6 89.6-8.704 11.776-17.92 24.064-17.92 45.056 0 30.72 19.968 76.288 33.792 103.936h-159.232c13.312-27.136 33.28-73.216 33.28-103.936zM983.04 953.856c0 15.872-15.872 29.184-35.84 29.184h-384c-19.968 0-35.84-13.312-35.84-29.184v-80.384c0-15.872 15.872-29.184 35.84-29.184h384c19.968 0 35.84 13.312 35.84 29.184v80.384z" /><path d="M779.776 289.28v-2.048-1.024c0-1.024-0.512-1.536-1.024-2.56 0 0 0-0.512-0.512-0.512-0.512-0.512-0.512-1.024-1.024-2.048 0-0.512-0.512-0.512-0.512-0.512-0.512-0.512-0.512-1.024-1.024-1.536l-0.512-0.512-0.512-0.512-295.424-264.704c-4.096-3.584-9.216-4.608-14.336-3.584H76.8c-36.864 0-66.56 29.696-66.56 66.56v870.4c0 36.864 29.696 66.56 66.56 66.56h318.464c8.704 0 15.36-6.656 15.36-15.36s-6.656-15.36-15.36-15.36H76.8c-19.968 0-35.84-15.872-35.84-35.84v-870.4c0-19.968 15.872-35.84 35.84-35.84h376.832v197.632c0 36.864 29.696 66.56 66.56 66.56h228.864v83.456c0 8.704 6.656 15.36 15.36 15.36s15.36-6.656 15.36-15.36v-98.816c0 0.512 0 0.512 0 0z m-259.584-14.848c-19.968 0-35.84-15.872-35.84-35.84v-179.2l240.128 215.04h-204.288z" /><path d="M469.504 484.864h-327.68c-8.704 0-15.36-6.656-15.36-15.36s6.656-15.36 15.36-15.36h327.68c8.704 0 15.36 6.656 15.36 15.36s-6.656 15.36-15.36 15.36zM469.504 716.8h-327.68c-8.704 0-15.36-6.656-15.36-15.36s6.656-15.36 15.36-15.36h327.68c8.704 0 15.36 6.656 15.36 15.36s-6.656 15.36-15.36 15.36z" /></svg>
+                            </span>
+                            Phân quyền
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Danh sách nhóm người dùng</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-bg-success">
+                                            Thêm Quyền
+                                        </button>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <label>Thêm quyền:</label>
+                                                        <input type="text" class="form-control text-center" id="new-role-name" placeholder="Nhập tên quyền">
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary" onclick="AddNewRole()">Save changes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer display" id="list-role" style="width:100%">
+                                            <thead>
+                                                <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                                                    <th class="min-w-50px" tabindex="1" arowspan="1" colspan="1" style="width:50px;">ID</th>
+                                                    <th class="min-w-150px" tabindex="2" rowspan="1" colspan="1" style="width:150px;">Quyền</th>
+                                                    <th class="text-end min-w-100px sorting_disabled" rowspan="1" colspan="1" style="width: 130.25px;">Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="role-list">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <a href="@Url.Action("Trash","Auth")" class="btn btn-light-danger me-3">
                             <!--begin::Svg Icon | path: icons/duotune/general/gen031.svg-->
                             <span class="svg-icon svg-icon-2">
@@ -132,9 +205,10 @@
                                             else
                                             {
                                                 <select id="role-id-@item.account_id" onchange="changerole(@item.account_id)" class="form-select form-select-solid" data-kt-select2="true" data-placeholder="Select option" data-allow-clear="true">
-                                                    <option @(item.Role == 0 ? "selected" : "") value="0">Quản trị viên</option>
-                                                     <option @(item.Role == 2 ? "selected" : "") value="2">Biên tập viên</option>
-                                                    <option @(item.Role == 1 ? "selected" : "") value="1">Người dùng</option>
+                                                    @foreach (var role in ViewBag.roles)
+                                                    {
+                                                        <option value="@role.role_id" @((role.role_id - 1) == item.Role ? "selected" : "")>@role.role_name</option>
+                                                    }
                                                 </select>
                                             }
                                         </td>
