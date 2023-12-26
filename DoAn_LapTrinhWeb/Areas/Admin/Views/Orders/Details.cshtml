@@ -563,7 +563,7 @@
             success: function (data) {
                 //window.location.href = "/Orders/ExportReceipt?id=" + id;
                 var mywindow = window.open('', 'Hóa đơn điện tử', 'height=600,width=800');
-                mywindow.document.write('<html><head><title>Print</title>');
+                mywindow.document.write('<html><head><title>Hóa đơn điện tử</title>');
                 mywindow.document.write('</head><body >');
                 mywindow.document.write(data.body);
                 mywindow.document.write('</body></html>');
