@@ -2456,6 +2456,7 @@
   <ItemGroup>
     <Content Include="EmailTemplate\EmailOrders.cshtml" />
     <Content Include="EmailTemplate\ConfirmAccount.cshtml" />
+    <Content Include="EmailTemplate\Receipt.cshtml" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

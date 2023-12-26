@@ -2,17 +2,15 @@
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Web.Hosting;
 using System.Web.Mvc;
 using ClosedXML.Excel;
 using ClosedXML.Excel.Drawings;
 using DoAn_LapTrinhWeb.Common.Helpers;
 using DoAn_LapTrinhWeb.DTOs;
 using DoAn_LapTrinhWeb.Model;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.Ajax.Utilities;
+using DoAn_LapTrinhWeb.Models;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using PagedList;
 
 namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
@@ -63,7 +61,7 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
 
         public ActionResult Details(int? id)
         {
-            Order order = db.Orders.FirstOrDefault(m => m.order_id == id);
+            Model.Order order = db.Orders.FirstOrDefault(m => m.order_id == id);
             ViewBag.ListProduct = db.Oder_Detail.Where(m => m.order_id == order.order_id).ToList();
             ViewBag.OrderHistory = db.Orders.Where(m => m.account_id == order.account_id).OrderByDescending(m=>m.oder_date).Take(10).ToList();
             if (order == null)
@@ -77,7 +75,7 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
         public JsonResult UpdateOrder(int id,string status)
         {
             string result = "error";
-            Order order = db.Orders.FirstOrDefault(m => m.order_id == id);
+            Model.Order order = db.Orders.FirstOrDefault(m => m.order_id == id);
             try
             {
                 if (order.status != "3")
@@ -105,7 +103,7 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
         public JsonResult CancleOrder(int id)
         {
             string result = "error";
-            Order order = db.Orders.FirstOrDefault(m => m.order_id == id);
+            Model.Order order = db.Orders.FirstOrDefault(m => m.order_id == id);
             try
             {
                 if (order.status != "3")
@@ -261,6 +259,45 @@ namespace DoAn_LapTrinhWeb.Areas.Admin.Controllers
                 //return static file về client
                 return Content("/Content/Export/" + nameFile);
             }
+        }
+
+        public JsonResult ExportReceipt(int order_id)
+        {
+            var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+            string orderItem = "";
+            string body = System.IO.File.ReadAllText(HostingEnvironment.MapPath("~/EmailTemplate/") + "Receipt" + ".cshtml");
+            var Order = db.Orders.Include("Account").Include("Oder_Detail").Include("Oder_Detail.Product").FirstOrDefault(m => m.order_id == order_id);
+            double priceSum = 0;
+            var orderItems = from od in db.Oder_Detail
+                             join p in db.Products on od.product_id equals p.product_id
+                             where od.order_id == Order.order_id
+                             select new
+                             {
+                                 ProductName = p.product_name,
+                                 Price = p.price
+                             };
+            foreach (var item in Order.Oder_Detail)
+            {
+                priceSum += item.quantity * item.price;
+            }
+            var orderDiscount = (priceSum + 30000 - Order.total).ToString("#,0₫", culture.NumberFormat);
+            var orderPrice = priceSum.ToString("#,0₫", culture.NumberFormat);
+            var orderTotal = Order.total.ToString("#,0₫", culture.NumberFormat);
+            foreach (var item in orderItems)
+            {
+                string formattedPrice = item.Price.ToString("#,0₫", culture.NumberFormat);
+                orderItem += "<tr style='margin'> <td align='left' width='75%' style=' padding: 6px 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;' >" +
+                                item.ProductName + "</td><td align='left' width='25%' style=' padding: 6px 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; ' >" + formattedPrice + "</td> </tr>";
+            }
+            string subject = "Thông tin đơn hàng #" + order_id;
+            body = body.Replace("{{order_id}}", order_id.ToString());
+            body = body.Replace("{{order_item}}", orderItem);
+            body = body.Replace("{{order_discount}}", orderDiscount);
+            body = body.Replace("{{order_price}}", orderPrice);
+            body = body.Replace("{{total}}", orderTotal);
+
+            //Trả view về client
+            return Json(new { body = body, subject = subject }, JsonRequestBehavior.AllowGet);
         }
     }
 }
