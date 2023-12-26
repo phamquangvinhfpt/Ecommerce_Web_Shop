@@ -1,4 +1,6 @@
-﻿@{
+﻿@using PagedList.Mvc
+@model PagedList.PagedList<DoAn_LapTrinhWeb.Model.Order>
+@{
     ViewBag.Title = "Bảng điều khiển";
     Layout = "~/Areas/Admin/Views/Shared/_MainLayout.cshtml";
     var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
@@ -15,6 +17,8 @@
     double percentPriceOrder = ((1) - ((totalPriceOrderLastMonth - totalPriceOrderThisMonth) / (totalPriceOrderLastMonth)));
     double total = 0;
     double total2 = 0;
+    double totalLaptop = 0;
+    double totalPhuKien = 0;
     //Tính doanh thu theo từng tháng
     List<double> listTotal = new List<double>();
     List<double> listTotal2 = new List<double>();
@@ -25,9 +29,14 @@
         listTotal.Add(total);
         listTotal2.Add(total2);
     }
-
+    string prePageIcon = "<i class='previous'></i>";
+    string nextPageIcon = "<i class='next'></i>";
 }
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
 <!--begin::toolbar-->
 <div class="toolbar" id="kt_toolbar">
     <!--begin::Container-->
@@ -130,16 +139,18 @@
                             {
                                 foreach (var orderDetail in OrderDetail)
                                 {
-                                    if (orderDetail.order_id == order.order_id && orderDetail.Product.type == 1 && order.oder_date.Month == DateTime.Now.Month && order.oder_date.Year == DateTime.Now.Year)
+                                    if (orderDetail.order_id == order.order_id && order.oder_date.Month == DateTime.Now.Month && order.oder_date.Year == DateTime.Now.Year)
                                     {
-                                        total += order.total;
+                                        if (orderDetail.Product.type == 1)
+                                        {
+                                            //tính tổng tiền của riêng laptop trong detail
+                                            totalLaptop += orderDetail.Product.price * orderDetail.quantity;
+                                        }
+                                        else if (orderDetail.Product.type == 2)
+                                        {
+                                            totalPhuKien += orderDetail.Product.price * orderDetail.quantity;
+                                        }
                                     }
-
-                                    if (orderDetail.order_id == order.order_id && orderDetail.Product.type == 2 && order.oder_date.Month == DateTime.Now.Month && order.oder_date.Year == DateTime.Now.Year)
-                                    {
-                                        total2 += order.total;
-                                    }
-
                                 }
                             }
                             <!--begin::Label-->
@@ -151,7 +162,7 @@
                                 <div class="text-gray-500 pe-1">Laptop</div>
                                 <!--end::Label-->
                                 <!--begin::Stats-->
-                                <div class="ms-auto fw-boldest text-gray-700 min-w-70px text-end">@total.ToString("#,0₫", culture.NumberFormat)</div>
+                                <div class="ms-auto fw-boldest text-gray-700 min-w-70px text-end">@totalLaptop.ToString("#,0₫", culture.NumberFormat)</div>
                                 <!--end::Stats-->
                             </div>
                             <!--end::Label-->
@@ -164,7 +175,7 @@
                                 <div class="text-gray-500 pe-1">P.Kiện</div>
                                 <!--end::Label-->
                                 <!--begin::Stats-->
-                                <div class="ms-auto fw-boldest text-gray-700 min-w-70px text-end">@total2.ToString("#,0₫", culture.NumberFormat)</div>
+                                <div class="ms-auto fw-boldest text-gray-700 min-w-70px text-end">@totalPhuKien.ToString("#,0₫", culture.NumberFormat)</div>
                                 <!--end::Stats-->
                             </div>
                             <!--end::Label-->
@@ -433,14 +444,15 @@
                                 <!--end::Amount-->
                                 <!--begin::Badge-->
                                 <!--<span class="badge badge-success fs-6 lh-1 py-1 px-2 d-flex flex-center" style="height: 22px">-->
-                                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr067.svg-->
-                                    <!--<span class="svg-icon svg-icon-7 svg-icon-white ms-n1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                            <path opacity="0.5" d="M13 9.59998V21C13 21.6 12.6 22 12 22C11.4 22 11 21.6 11 21V9.59998H13Z" fill="black" />
-                                            <path d="M5.7071 7.89291C5.07714 8.52288 5.52331 9.60002 6.41421 9.60002H17.5858C18.4767 9.60002 18.9229 8.52288 18.2929 7.89291L12.7 2.3C12.3 1.9 11.7 1.9 11.3 2.3L5.7071 7.89291Z" fill="black" />
-                                        </svg>
-                                    </span>-->
-                                    <!--end::Svg Icon--><!--2.6%
+                                <!--begin::Svg Icon | path: icons/duotune/arrows/arr067.svg-->
+                                <!--<span class="svg-icon svg-icon-7 svg-icon-white ms-n1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path opacity="0.5" d="M13 9.59998V21C13 21.6 12.6 22 12 22C11.4 22 11 21.6 11 21V9.59998H13Z" fill="black" />
+                                        <path d="M5.7071 7.89291C5.07714 8.52288 5.52331 9.60002 6.41421 9.60002H17.5858C18.4767 9.60002 18.9229 8.52288 18.2929 7.89291L12.7 2.3C12.3 1.9 11.7 1.9 11.3 2.3L5.7071 7.89291Z" fill="black" />
+                                    </svg>
+                                </span>-->
+                                <!--end::Svg Icon-->
+                                <!--2.6%
                                 </span>-->
                                 <!--end::Badge-->
                             </div>
@@ -497,61 +509,89 @@
         <div class="row g-5 g-xl-10 mb-xl-10">
             <canvas id="myChart"></canvas>
         </div>
-            <!--begin::Row-->
-            <div class="row gy-5 g-xl-10">
-                <!--begin::Col-->
-                <div class="col-xl-4 mb-xl-10">
-                    <!--begin::Engage widget 1-->
-                    <div class="card h-md-100">
-                        <!--begin::Body-->
-                        <div class="card-body d-flex flex-column flex-center">
-                            <!--begin::Heading-->
-                            <div class="mb-2">
-                                <!--begin::Title-->
-                                <h1 class="fw-bold text-gray-800 text-center lh-lg">
-                                    Have you tried
-                                    <br />new
-                                    <span class="fw-boldest">eCommerce App ?</span>
-                                </h1>
-                                <!--end::Title-->
-                                <!--begin::Illustration-->
-                                <div class="flex-grow-1 bgi-no-repeat bgi-size-contain bgi-position-x-center card-rounded-bottom h-200px mh-200px my-5 my-lg-12" style="background-image:url('/Images/Admin/assets/media/svg/illustrations/easy/2.svg')"></div>
-                                <!--end::Illustration-->
-                            </div>
-                            <!--end::Heading-->
-                            <!--begin::Links-->
-                            <div class="text-center">
-                                <!--begin::Link-->
-                                <a class="btn btn-sm btn-primary me-2" href="@Url.Action("Index","ProductsAdmin")">View App</a>
-                                <!--end::Link-->
-                                <!--begin::Link-->
-                                <a class="btn btn-sm btn-light" href="@Url.Action("Index","ProductsAdmin")">New Product</a>
-                                <!--end::Link-->
-                            </div>
-                            <!--end::Links-->
-                        </div>
-                        <!--end::Body-->
-                    </div>
-                    <!--end::Engage widget 1-->
-                </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-xl-8 mb-5 mb-xl-10">
-                    <!--begin::Table Widget 4-->
-                    <div class="card card-flush h-xl-100">
-                        <!--begin::Card header-->
-                        <div class="card-header pt-7">
+        <!--begin::Row-->
+        <div class="row gy-5 g-xl-10">
+            <!--begin::Col-->
+            <div class="col-xl-4 mb-xl-10">
+                <!--begin::Engage widget 1-->
+                <div class="card h-md-100">
+                    <!--begin::Body-->
+                    <div class="card-body d-flex flex-column flex-center">
+                        <!--begin::Heading-->
+                        <div class="mb-2">
                             <!--begin::Title-->
-                            <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-dark">Đơn đặt hàng</span>
-                            </h3>
+                            <h1 class="fw-bold text-gray-800 text-center lh-lg">
+                                Have you tried
+                                <br />new
+                                <span class="fw-boldest">eCommerce App ?</span>
+                            </h1>
                             <!--end::Title-->
+                            <!--begin::Illustration-->
+                            <div class="flex-grow-1 bgi-no-repeat bgi-size-contain bgi-position-x-center card-rounded-bottom h-200px mh-200px my-5 my-lg-12" style="background-image:url('/Images/Admin/assets/media/svg/illustrations/easy/2.svg')"></div>
+                            <!--end::Illustration-->
                         </div>
-                        <!--end::Card header-->
-                        <!--begin::Card body-->
-                        <div class="card-body">
+                        <!--end::Heading-->
+                        <!--begin::Links-->
+                        <div class="text-center">
+                            <!--begin::Link-->
+                            <a class="btn btn-sm btn-primary me-2" href="@Url.Action("Index","ProductsAdmin")">View App</a>
+                            <!--end::Link-->
+                            <!--begin::Link-->
+                            <a class="btn btn-sm btn-light" href="@Url.Action("Index","ProductsAdmin")">New Product</a>
+                            <!--end::Link-->
+                        </div>
+                        <!--end::Links-->
+                    </div>
+                    <!--end::Body-->
+                </div>
+                <!--end::Engage widget 1-->
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-xl-8 mb-5 mb-xl-10">
+                <!--begin::Table Widget 4-->
+                <div class="card card-flush h-xl-100">
+                    <!--begin::Card header-->
+                    <div class="card-header pt-7">
+                        <!--begin::Title-->
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bolder text-dark">Đơn đặt hàng</span>
+                        </h3>
+                        <!--end::Title-->
+                    </div>
+                    <!--end::Card header-->
+                    <!--begin::Card body-->
+                    <div class="card-body">
+                        <div class="filter">
+                            <!--From ... To ... Button Filter-->
+                            <div class="row mb-12">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" placeholder="Từ ngày" id="kt_datepicker_1" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" placeholder="Đến ngày" id="kt_datepicker_2" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button onclick="filter()" type="button" class="btn btn-primary">Lọc</button>
+                                    <a href="#" id="btnExportExcel" class="btn btn-light-success me-3">
+                                        <!--begin::Svg Icon | path: icons/duotune/general/gen031.svg-->
+                                        <span class="svg-icon svg-icon-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40" zoomAndPan="magnify" viewBox="0 0 30 30.000001" height="40" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="id1"><path d="M 2.742188 3.484375 L 27.417969 3.484375 L 27.417969 25.257812 L 2.742188 25.257812 Z M 2.742188 3.484375 " clip-rule="nonzero" /></clipPath></defs><g clip-path="url(#id1)"><path fill="rgb(49.798584%, 72.938538%, 0%)" d="M 15.082031 3.484375 L 2.742188 5.902344 L 2.742188 22.839844 L 15.082031 25.257812 Z M 17.546875 5.902344 L 17.546875 8.324219 L 20.015625 8.324219 L 20.015625 10.742188 L 17.546875 10.742188 L 17.546875 13.160156 L 20.015625 13.160156 L 20.015625 15.582031 L 17.546875 15.582031 L 17.546875 18 L 20.015625 18 L 20.015625 20.417969 L 17.546875 20.417969 L 17.546875 22.839844 L 27.417969 22.839844 L 27.417969 5.902344 Z M 22.484375 8.324219 L 24.953125 8.324219 L 24.953125 10.742188 L 22.484375 10.742188 Z M 5.425781 9.890625 L 7.621094 9.890625 L 8.757812 12.570312 C 8.851562 12.789062 8.921875 13.042969 8.992188 13.332031 L 9.023438 13.332031 C 9.066406 13.160156 9.148438 12.894531 9.273438 12.550781 L 10.542969 9.890625 L 12.542969 9.890625 L 10.15625 14.332031 L 12.613281 18.851562 L 10.480469 18.851562 L 9.105469 15.929688 C 9.054688 15.828125 8.992188 15.621094 8.941406 15.332031 L 8.921875 15.332031 C 8.890625 15.46875 8.832031 15.675781 8.738281 15.953125 L 7.351562 18.851562 L 5.210938 18.851562 L 7.753906 14.367188 Z M 22.484375 13.160156 L 24.953125 13.160156 L 24.953125 15.582031 L 22.484375 15.582031 Z M 22.484375 18 L 24.953125 18 L 24.953125 20.417969 L 22.484375 20.417969 Z M 22.484375 18 " fill-opacity="1" fill-rule="nonzero" /></g></svg>
+                                        </span>
+                                        <!--end::Svg Icon-->Export Excel
+                                    </a>
+                                </div>
+
+                            </div>
+                            <form>
+                                <input id="search" type="search" name="search" class="form-control form-control-solid w-250px ps-14" placeholder="Tìm kiếm đơn hàng...">
+                            </form>
                             <!--begin::Table-->
-                            <table class="table align-middle table-row-dashed fs-6 gy-3">
+                            <table id="example" class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
                                 <!--begin::Table head-->
                                 <thead>
                                     <!--begin::Table row-->
@@ -568,8 +608,8 @@
                                 </thead>
                                 <!--end::Table head-->
                                 <!--begin::Table body-->
-                                <tbody class="fw-bolder text-gray-600">
-                                    @foreach (var item in listOrder)
+                                <tbody id="productTableBody" class="fw-bolder text-gray-600">
+                                    @foreach (var item in Model)
                                     {
                                         <tr>
                                             <td>
@@ -625,6 +665,24 @@
                             </table>
                             <!--end::Table-->
                         </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start">
+                            </div>
+                            <div class="col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end">
+                                <div id="pagination">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", new { search = @ViewBag.search, start = @ViewBag.start, end = @ViewBag.end, page }), new PagedListRenderOptions
+                               {
+                                   LinkToPreviousPageFormat = prePageIcon,
+                                   LinkToNextPageFormat = nextPageIcon,
+                                   DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+                                   DisplayLinkToLastPage = PagedListDisplayMode.Never,
+                                   DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                                   DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                                   MaximumPageNumbersToDisplay = 10
+                               })
+                                </div>
+                            </div>
+                        </div>
                         <!--end::Card body-->
                     </div>
                     <!--end::Table Widget 4-->
@@ -635,95 +693,199 @@
         </div>
         <!--end::Container-->
     </div>
-<script>
+    <script>
     //convert listTotal và listTotal2 sang javascript
     var listTotal = @Html.Raw(Json.Encode(@listTotal));
     var listTotal2 = @Html.Raw(Json.Encode(@listTotal2));
     console.log(listTotal);
     console.log(listTotal2);
-    //Tạo doanh thu dựa listTotal và listTotal2 ở trên làm thống kê tổng doanh thu của tháng đó và tháng trước đó trên cùng 1 biểu đồ cả 2 list này là data của 12 tháng
     var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-        type: 'bar', //bar là biểu đồ cột
-        data: {
-            labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5','Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10','Tháng 11', 'Tháng 12'],
-            datasets: [{
-                label: 'Doanh thu tháng này',
-                data: listTotal,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)', //màu của cột
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)', 
-                    'rgba(75, 192, 192, 0.2)', 
-                    'rgba(153, 102, 255, 0.2)', 
-                    'rgba(255, 159, 64, 0.2)', 
-                    'rgba(255, 99, 132, 0.2)', 
-                    'rgba(54, 162, 235, 0.2)', 
-                    'rgba(255, 206, 86, 0.2)', 
-                    'rgba(75, 192, 192, 0.2)', 
-                    'rgba(153, 102, 255, 0.2)', 
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)', //màu viền của cột
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)', 
-                    'rgba(75, 192, 192, 1)', 
-                    'rgba(153, 102, 255, 1)', 
-                    'rgba(255, 159, 64, 1)', 
-                    'rgba(255, 99, 132, 1)', 
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }, {
-            label: 'Doanh thu tháng trước',
-            data: listTotal2,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)', //màu của cột
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)', 
-                'rgba(75, 192, 192, 0.2)', 
-                'rgba(153, 102, 255, 0.2)', 
-                'rgba(255, 159, 64, 0.2)', 
-                'rgba(255, 99, 132, 0.2)', 
-                'rgba(54, 162, 235, 0.2)', 
-                'rgba(255, 206, 86, 0.2)', 
-                'rgba(75, 192, 192, 0.2)', 
-                'rgba(153, 102, 255, 0.2)', 
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)', //màu viền của cột
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)', 
-                'rgba(75, 192, 192, 1)', 
-                'rgba(153, 102, 255, 1)', 
-                'rgba(255, 159, 64, 1)', 
-                'rgba(255, 99, 132, 1)', 
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true //bắt đầu từ 0
+        var myChart = new Chart(ctx, {
+            type: 'bar', //bar là biểu đồ cột
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                datasets: [{
+                    label: 'Doanh thu tháng này',
+                    data: listTotal,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)', //màu của cột
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)', //màu viền của cột
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }, {
+                    label: 'Doanh thu tháng trước',
+                    data: listTotal2,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)', //màu của cột
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)', //màu viền của cột
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true //bắt đầu từ 0
+                    }
                 }
             }
+        });
+
+        function filter() {
+            var from = document.getElementById("kt_datepicker_1").value;
+            var to = document.getElementById("kt_datepicker_2").value;
+            $.ajax({
+                url: "/Admin/DashBoards/Index",
+                type: "Get",
+                data: {
+                    start: from,
+                    end: to
+                },
+                success: function (response) {
+                    var newTableBody = $(response).find("#productTableBody").html();
+                    var newpagination = $(response).find("#pagination").html();
+                    console.log(newTableBody);
+                    console.log(newpagination);
+                    $("#productTableBody").html(newTableBody); // Cập nhật nội dung của bảng sản phẩm
+                    $("#pagination").html(newpagination);
+                }
+            });
         }
-    });
-</script>
-<!--end::Post-->
-@section scripts{
-    <script src="~/Scripts/AdminJS/vis-timeline.bundle.js"></script>
-    <script src="~/Scripts/AdminJS/widgets.bundle.js"></script>
-}
+
+        $(document).ready(function () {
+            // Xử lý sự kiện khi người dùng chuyển trang
+            $(document).on("click", ".pagination a", function (event) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
+
+                var url = $(this).attr("href"); // Lấy URL của trang mới
+                var pageNumber = getParameterByName("page", url); // Lấy số trang từ URL
+
+                // Gửi yêu cầu Ajax đến server
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    success: function (result) {
+                        var newTableBody = $(result).find("#productTableBody").html();
+                        console.log(newTableBody);
+                        $("#productTableBody").html(newTableBody); // Cập nhật nội dung của bảng sản phẩm
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText); // Xử lý lỗi nếu có
+                    }
+                });
+
+                //Bôi đen thẻ <a> đang được chọn
+                $(this).parent("li").addClass("active");
+                //Xóa bôi đen thẻ <a> đang được chọn
+                $(this).parent("li").siblings().removeClass("active");
+            });
+
+            // Hàm trợ giúp lấy giá trị của tham số từ URL
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+        });
+
+        $(document).ready(function () {
+            //xử lý sự kiện khi người dùng nhập vào ô tìm kiếm
+            $("#search").keyup(function () {
+                var keyword = $(this).val(); //lấy nội dung người dùng nhập vào
+                var start = document.getElementById("kt_datepicker_1").value;
+                var end = document.getElementById("kt_datepicker_2").value;
+                $.ajax({
+                    url: "/Admin/DashBoards/Index",
+                    type: "Get",
+                    data: {
+                        search: keyword,
+                        start: start,
+                        end: end
+                    },
+                    success: function (response) {
+                        var newTableBody = $(response).find("#productTableBody").html();
+                        var newpagination = $(response).find("#pagination").html();
+                        console.log(newTableBody);
+                        console.log(newpagination);
+                        $("#productTableBody").html(newTableBody); // Cập nhật nội dung của bảng sản phẩm
+                        $("#pagination").html(newpagination);
+                    }
+                });
+            });
+        });
+
+        $('#btnExportExcel').on('click', function () {
+            var from = document.getElementById("kt_datepicker_1").value;
+            var to = document.getElementById("kt_datepicker_2").value;
+            $.ajax({
+                url: '/Admin/DashBoards/ExportExcel',
+                type: 'GET',
+                data: {
+                    start: from,
+                    end: to
+                },
+                datatype: 'json',
+                success: function (res) {
+                    location.href = res;
+                }
+            })
+        });
+    </script>
+    <link href="~/Content/AdminCSS/PagedList.css" rel="stylesheet" />
+    <!--end::Post-->
+    @section scripts{
+        <script src="~/Scripts/AdminJS/vis-timeline.bundle.js"></script>
+        <script src="~/Scripts/AdminJS/widgets.bundle.js"></script>
+    }

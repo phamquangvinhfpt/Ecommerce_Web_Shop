@@ -26,6 +26,7 @@ namespace DoAn_LapTrinhWeb.Controllers
     {
         private DbContext db = new DbContext();
         //View đăng nhập
+        [HttpGet]
         public ActionResult Login(string returnUrl)
         {
             if (String.IsNullOrEmpty(returnUrl) && Request.UrlReferrer != null && Request.UrlReferrer.ToString().Length > 0)
@@ -44,7 +45,7 @@ namespace DoAn_LapTrinhWeb.Controllers
         public ActionResult Login(LoginViewModels model,string returnUrl)
         {
             model.Password = Crypto.Hash(model.Password);
-            Account account = db.Accounts.FirstOrDefault(m => m.Email == model.Email && m.password == model.Password && m.status == "1");
+            Account account = db.Accounts.FirstOrDefault(m => m.Email == model.Email && m.password == model.Password && m.status == "1"); 
             if (account != null)
             {
                 LoggedUserData userData = new LoggedUserData

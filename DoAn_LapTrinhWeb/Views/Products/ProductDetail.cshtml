@@ -59,8 +59,7 @@
             }
         }
     }
-    avg = (onestar * c_onestar / totalrating) + (truestar * c_truestar / totalrating) + (threestar * c_threestar / totalrating) +
-    (fourstar * c_fourstar / totalrating) + (fivestar * c_fivestar / totalrating);
+    avg = (onestar * c_onestar + truestar * c_truestar + threestar * c_threestar + fourstar * c_fourstar + fivestar * c_fivestar) / totalrating;
     if (avg >= 1 && avg < 2)
     {
         avgStar = "<li class='fill'><i class='ion-android-star'></i></li>" +
