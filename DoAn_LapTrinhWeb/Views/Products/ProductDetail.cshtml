@@ -30,32 +30,26 @@
     {
         if (item.product_id == Model.product_id)
         {
-            foreach (var orderitem in OrderFeedback)
+            totalrating++;
+            if (item.rate_star == 1)
             {
-                if (orderitem.product_id == item.product_id && item.product_id == Model.product_id && orderitem.Order.status == "3")
-                {
-                    totalrating++;
-                    if (item.rate_star == 1)
-                    {
-                        c_onestar++;
-                    }
-                    if (item.rate_star == 2)
-                    {
-                        c_truestar++;
-                    }
-                    if (item.rate_star == 3)
-                    {
-                        c_threestar++;
-                    }
-                    if (item.rate_star == 4)
-                    {
-                        c_fourstar++;
-                    }
-                    if (item.rate_star == 5)
-                    {
-                        c_fivestar++;
-                    }
-                }
+                c_onestar++;
+            }
+            else if (item.rate_star == 2)
+            {
+                c_truestar++;
+            }
+            else if (item.rate_star == 3)
+            {
+                c_threestar++;
+            }
+            else if (item.rate_star == 4)
+            {
+                c_fourstar++;
+            }
+            else if (item.rate_star == 5)
+            {
+                c_fivestar++;
             }
         }
     }
