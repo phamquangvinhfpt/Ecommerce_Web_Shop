@@ -117,6 +117,7 @@
                                 @foreach (var item in Model)
                                 {
                                     <tr class="odd" id="item_@item.account_id">
+                                        <td hidden id="id_account_active">@item.account_id </td>
                                         <td>@item.account_id </td>
                                         <td>@item.Name</td>
                                         <td>@item.Email</td>
@@ -148,7 +149,7 @@
                                                 <!--end::Menu item-->
                                                 <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
-                                                    <a onclick="isActiveOpen(@item.account_id, '@item.Email')" class="menu-link px-3">Khôi phục</a>
+                                                    <a onclick="isActiveOpen(@item.account_id)" class="menu-link px-3">Khôi phục</a>
                                                 </div>
                                                 <!--end::Menu item-->
                                             </div>

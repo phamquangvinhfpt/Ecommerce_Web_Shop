@@ -1,4 +1,5 @@
-﻿//3. Xóa
+﻿
+//3. Xóa
 let disableModal = $('#disable-modal');
 let activeModal = $('#active-modal');
 //list-role
@@ -372,57 +373,62 @@ $('#disable__submit').click(function () {
     });
 });
 
-//3. Khôi phục tài khoản
-var isActiveOpen = function (id, email) {
-    activeModal.find('#active__name').text(email);
-    activeModal.modal('show');
-    accountID = id;
-}
-
-$('#active__submit').click(function () {
-    $.ajax({
-        type: "POST",
-        url: '/Auth/IsActive',
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({ id: accountID }),
-        dataType: "json",
-        success: function (result) {
-            if (result == "success") {
-                disableModal.modal('hide');
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+function isActiveOpen(id) {
+    Swal.fire({
+        title: "Bạn muốn kích hoạt tài khoản này?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Kích hoạt",
+        cancelButtonText: "Hủy",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+    }).then((result) => {
+        //if user click confirm
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: '/Auth/IsActive',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ id: id }),
+                dataType: "json",
+                success: function (result) {
+                    if (result == "success") {
+                        activeModal.modal('hide');
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        })
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Kích hoạt tài khoản thành công'
+                        })
+                        window.location.reload();
+                        return;
                     }
-                })
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Khôi phục tài khoản thành công'
-                })
-                $("#item_" + accountID).remove();
-                activeModal.modal('hide');
-                return;
-            }
-        },
-        error: function () {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                },
+                error: function () {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    })
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Lỗi'
+                    })
                 }
-            })
-            Toast.fire({
-                icon: 'error',
-                title: 'Lỗi'
-            })
+            });
         }
-    });
-});
+    })
+}
