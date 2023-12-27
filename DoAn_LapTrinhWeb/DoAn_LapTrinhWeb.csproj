@@ -2443,6 +2443,7 @@
     <Content Include="Views\Cart\PreviewCart.cshtml" />
     <Content Include="Views\Account\Address.cshtml" />
     <Content Include="Views\Account\ConfirmAccount.cshtml" />
+    <Content Include="Views\Shared\Search_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

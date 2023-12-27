@@ -195,5 +195,11 @@ namespace DoAn_LapTrinhWeb.Controllers
             ViewBag.Showing = list.Count();
             return list;
         }
+
+        public JsonResult SearchProduct(string keyword)
+        {
+            var list = db.Products.Where(m => m.product_name.Contains(keyword)).Select(m => new { m.product_name, m.product_id, m.image }).ToList();
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
     }
 }
