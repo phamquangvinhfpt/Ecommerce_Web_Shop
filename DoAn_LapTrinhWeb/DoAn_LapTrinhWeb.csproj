@@ -2452,7 +2452,6 @@
     <Folder Include="Images\Admin\General\Thumbnail\" />
     <Folder Include="Images\General\" />
     <Folder Include="obj\" />
-    <Folder Include="Views\Route\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="EmailTemplate\EmailOrders.cshtml" />
